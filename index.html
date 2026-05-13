@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#07111F">
+<title>LENSIGHT — Multimodal Digital Health Ecosystem</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#07111F;--space:#0E1B2E;--cyan:#00D1FF;--teal:#00FFC6;--violet:#8B7CFF;--smoke:#F5F7FA;
+  --glass:rgba(255,255,255,0.05);--gb:rgba(255,255,255,0.08);
+  --gc:0 0 40px rgba(0,209,255,0.3);--gv:0 0 40px rgba(139,124,255,0.3);
+  --fh:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;overflow-x:hidden;}
+body{background:var(--navy);color:var(--smoke);font-family:var(--fb);overflow-x:hidden;cursor:none;}
+.cursor{position:fixed;width:10px;height:10px;background:var(--cyan);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;transition:transform .1s;}
+.cring{position:fixed;width:32px;height:32px;border:1px solid rgba(0,209,255,0.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);mix-blend-mode:screen;transition:left .12s,top .12s;}
+.spbar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--violet));z-index:9997;width:0%;}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,17,31,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--gb);}
+.nlogo{font-family:var(--fh);font-size:1.4rem;font-weight:800;background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nbadge{font-family:var(--fm);font-size:.58rem;color:var(--teal);border:1px solid rgba(0,255,198,.3);padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+.nlinks{display:flex;gap:28px;list-style:none;}
+.nlinks a{font-size:.78rem;color:rgba(245,247,250,.55);text-decoration:none;transition:color .2s;text-transform:uppercase;letter-spacing:.05em;}
+.nlinks a:hover{color:var(--cyan);}
+.ncta{background:linear-gradient(135deg,var(--cyan),var(--violet));border:none;color:var(--navy);font-family:var(--fh);font-weight:700;font-size:.78rem;padding:9px 20px;border-radius:8px;cursor:none;transition:all .2s;}
+.ncta:hover{transform:translateY(-2px);box-shadow:var(--gc);}
+/* LOADER */
+#loader{position:fixed;inset:0;z-index:10000;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s,visibility .8s;}
+#loader.gone{opacity:0;visibility:hidden;}
+.leye{width:80px;height:80px;border:2px solid rgba(0,209,255,.15);border-radius:50%;position:relative;animation:lspin 2s linear infinite;}
+.leye::before{content:'';position:absolute;inset:10px;border:2px solid rgba(0,255,198,.2);border-radius:50%;animation:lspin 1.5s linear infinite reverse;}
+.leye::after{content:'';position:absolute;inset:22px;background:radial-gradient(var(--cyan),var(--violet));border-radius:50%;animation:lpulse 1s ease infinite alternate;}
+@keyframes lspin{to{transform:rotate(360deg)}}
+@keyframes lpulse{from{opacity:.4;transform:scale(.8)}to{opacity:1;transform:scale(1.1)}}
+#loader .lt{font-family:var(--fh);font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:24px;}
+#loader .ls{font-family:var(--fm);font-size:.6rem;color:rgba(0,209,255,.4);margin-top:8px;letter-spacing:.2em;}
+.lbar-wrap{width:200px;height:2px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:20px;overflow:hidden;}
+.lbar{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:2px;transition:width .1s;}
+/* SECTION */
+section{padding:90px 48px;position:relative;}
+.stag{font-family:var(--fm);font-size:.62rem;color:var(--teal);letter-spacing:.3em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.stag::before{content:'';width:28px;height:1px;background:var(--teal);}
+h2.sh{font-family:var(--fh);font-size:clamp(2rem,3.5vw,3rem);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin-bottom:14px;}
+h2.sh .g{background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sdesc{color:rgba(245,247,250,.5);font-size:.93rem;line-height:1.7;max-width:580px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+/* GLASS CARD */
+.gc{background:rgba(14,27,46,.65);backdrop-filter:blur(16px);border:1px solid var(--gb);border-radius:14px;padding:24px;transition:all .3s;position:relative;overflow:hidden;}
+.gc::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 0%,rgba(0,209,255,.04),transparent 60%);pointer-events:none;}
+.gc:hover{transform:translateY(-4px);box-shadow:0 16px 50px rgba(0,0,0,.4),var(--gc);border-color:rgba(0,209,255,.18);}
+/* BTN */
+.bp{background:linear-gradient(135deg,var(--cyan),var(--violet));border:none;color:var(--navy);font-family:var(--fh);font-weight:700;font-size:.82rem;padding:13px 26px;border-radius:9px;cursor:none;transition:all .25s;position:relative;}
+.bp:hover{transform:translateY(-3px);box-shadow:0 10px 35px rgba(0,209,255,.4);}
+.bo{background:transparent;border:1px solid rgba(0,209,255,.35);color:var(--cyan);font-family:var(--fh);font-weight:600;font-size:.82rem;padding:13px 26px;border-radius:9px;cursor:none;transition:all .25s;}
+.bo:hover{background:rgba(0,209,255,.07);border-color:var(--cyan);}
+/* INPUT RANGE */
+input[type=range]{width:100%;-webkit-appearance:none;height:4px;border-radius:2px;background:rgba(255,255,255,.1);outline:none;cursor:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--cyan);cursor:none;box-shadow:0 0 8px rgba(0,209,255,.5);}
+/* REVEAL */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+.rv.on{opacity:1;transform:none;}
+.rvl{opacity:0;transform:translateX(-24px);transition:opacity .6s ease,transform .6s ease;}
+.rvl.on{opacity:1;transform:none;}
+.rvr{opacity:0;transform:translateX(24px);transition:opacity .6s ease,transform .6s ease;}
+.rvr.on{opacity:1;transform:none;}
+/* AMBIENT */
+.amb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;opacity:.08;}
+
+/* ============ HERO ============ */
+#hero{min-height:100vh;display:flex;align-items:center;overflow:hidden;padding:110px 48px 60px;}
+#hcanvas{position:absolute;inset:0;z-index:0;}
+.hc{position:relative;z-index:2;max-width:680px;}
+.heyebrow{font-family:var(--fm);font-size:.68rem;color:var(--teal);letter-spacing:.3em;text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.heyebrow::before{content:'';width:36px;height:1px;background:var(--teal);}
+.htag{font-size:.9rem;color:rgba(245,247,250,.45);font-style:italic;margin-bottom:16px;}
+h1.htitle{font-family:var(--fh);font-size:clamp(4.5rem,10vw,8.5rem);font-weight:800;line-height:.88;letter-spacing:-.04em;margin-bottom:14px;}
+h1.htitle span{background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 30px rgba(0,209,255,.35));}
+.hsub{font-size:.92rem;color:rgba(245,247,250,.55);max-width:510px;line-height:1.65;margin-bottom:38px;}
+.hbtns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:52px;}
+.hstats{display:flex;gap:36px;flex-wrap:wrap;}
+.hstat .n{font-family:var(--fh);font-size:1.9rem;font-weight:800;background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hstat .l{font-size:.68rem;color:rgba(245,247,250,.35);text-transform:uppercase;letter-spacing:.1em;margin-top:2px;}
+/* Hero Dashboard */
+.hdash{position:absolute;right:5%;top:50%;transform:translateY(-50%);z-index:2;display:flex;flex-direction:column;gap:12px;animation:hfloat 5s ease-in-out infinite;}
+@keyframes hfloat{0%,100%{transform:translateY(-50%)}50%{transform:translateY(calc(-50% - 12px))}}
+.hdc{background:rgba(14,27,46,.9);backdrop-filter:blur(20px);border:1px solid var(--gb);border-radius:13px;padding:14px 18px;min-width:190px;position:relative;overflow:hidden;}
+.hdc::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+.hdcl{font-family:var(--fm);font-size:.58rem;color:rgba(245,247,250,.35);text-transform:uppercase;letter-spacing:.15em;margin-bottom:6px;}
+.hdcv{font-family:var(--fh);font-size:1.5rem;font-weight:800;}
+.hdbr{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:8px;overflow:hidden;}
+.hdbf{height:100%;border-radius:2px;}
+
+/* ============ ABOUT ============ */
+#about{background:linear-gradient(180deg,var(--navy),var(--space));}
+.dgap{background:rgba(14,27,46,.8);border:1px solid var(--gb);border-radius:18px;padding:36px;margin-top:40px;}
+.tierrow{display:flex;gap:16px;flex-wrap:wrap;margin-top:28px;}
+.tc{padding:16px 22px;border-radius:12px;cursor:none;transition:all .3s;text-align:center;min-width:110px;}
+.tc:hover{transform:translateY(-4px);}
+.tc .tn{font-family:var(--fh);font-size:.95rem;font-weight:800;}
+.tc .tr{font-family:var(--fm);font-size:.58rem;opacity:.55;margin-top:3px;}
+.tc .td{font-size:.72rem;color:rgba(245,247,250,.45);margin-top:6px;}
+
+/* ============ ECOSYSTEM ============ */
+#ecosystem{overflow:hidden;}
+#ecomap{width:100%;height:480px;border-radius:16px;border:1px solid var(--gb);overflow:hidden;}
+
+/* ============ DIAGNOSTIC ============ */
+#diagnostic{background:linear-gradient(180deg,var(--space),var(--navy));}
+.ttabs{display:flex;gap:4px;background:rgba(255,255,255,.03);border-radius:12px;padding:4px;margin-bottom:28px;overflow-x:auto;flex-wrap:wrap;}
+.ttab{font-family:var(--fm);font-size:.68rem;padding:9px 16px;border-radius:8px;cursor:none;border:none;background:transparent;color:rgba(245,247,250,.45);transition:all .2s;letter-spacing:.06em;white-space:nowrap;}
+.ttab.on{background:linear-gradient(135deg,rgba(0,209,255,.18),rgba(139,124,255,.18));color:var(--smoke);border:1px solid rgba(0,209,255,.2);}
+.tpanel{display:none;}
+.tpanel.on{display:block;animation:fin .3s ease;}
+@keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* CONTRAST */
+.csgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:560px;margin-bottom:16px;}
+.cscell{background:rgba(14,27,46,.8);border:1px solid var(--gb);border-radius:8px;padding:11px 6px;text-align:center;font-family:var(--fh);font-size:1.15rem;font-weight:700;transition:all .25s;cursor:none;user-select:none;}
+.cscell:hover{border-color:var(--cyan);box-shadow:0 0 20px rgba(0,209,255,.2);}
+.cscell.sel{border-color:var(--teal)!important;background:rgba(0,255,198,.1)!important;box-shadow:0 0 20px rgba(0,255,198,.3);}
+
+/* SPATIAL FREQ */
+.sfpanels{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;max-width:600px;}
+.sfp{border-radius:10px;overflow:hidden;cursor:none;transition:all .25s;position:relative;}
+.sfp canvas{display:block;width:100%;aspect-ratio:1;}
+.sfp .sfl{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-family:var(--fm);font-size:.55rem;color:rgba(0,209,255,.7);background:rgba(5,10,18,.7);padding:2px 6px;border-radius:4px;white-space:nowrap;}
+.sfp.sel{outline:2px solid var(--teal);box-shadow:0 0 15px rgba(0,255,198,.3);}
+
+/* GLARE */
+.glarew{position:relative;max-width:480px;height:240px;border-radius:14px;overflow:hidden;background:#060c14;border:1px solid var(--gb);}
+.glarew .gnums{position:absolute;inset:0;display:flex;gap:32px;align-items:center;justify-content:center;z-index:1;}
+.gnum{font-family:var(--fh);font-size:2.4rem;font-weight:800;color:rgba(245,247,250,.9);width:52px;text-align:center;transition:color .3s;}
+#govl{position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:14px;}
+.gtarget-info{display:inline-block;font-family:var(--fm);font-size:.65rem;padding:4px 12px;border-radius:10px;margin-top:8px;}
+
+/* FOG */
+.fogw{position:relative;max-width:480px;}
+.fogscene{width:100%;height:220px;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#0d2137,#152b44);border:1px solid var(--gb);position:relative;display:flex;align-items:center;justify-content:center;}
+.fogcity{font-size:3.5rem;position:relative;z-index:1;text-shadow:0 0 20px rgba(0,209,255,.5);}
+#fogvl{position:absolute;inset:0;background:rgba(180,195,210,0);transition:background .15s;border-radius:14px;}
+
+/* LCRI ENGINE */
+.lcribox{background:rgba(14,27,46,.85);border:1px solid var(--gb);border-radius:18px;padding:32px;}
+.lscore{text-align:center;margin-bottom:28px;}
+.lsnum{font-family:var(--fh);font-size:5rem;font-weight:800;line-height:1;transition:color .5s;}
+.ltbadge{display:inline-block;font-family:var(--fm);font-size:.65rem;padding:5px 16px;border-radius:20px;margin-top:8px;letter-spacing:.1em;text-transform:uppercase;}
+.lt-L{background:rgba(0,255,198,.1);color:var(--teal);border:1px solid rgba(0,255,198,.25);}
+.lt-P{background:rgba(0,209,255,.1);color:var(--cyan);border:1px solid rgba(0,209,255,.25);}
+.lt-V{background:rgba(139,124,255,.1);color:var(--violet);border:1px solid rgba(139,124,255,.25);}
+.wrow{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.wlbl{font-family:var(--fm);font-size:.62rem;color:rgba(245,247,250,.45);width:140px;text-transform:uppercase;letter-spacing:.04em;}
+.wtrk{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+.wfill{height:100%;border-radius:3px;transition:width .6s ease;}
+.wpct{font-family:var(--fm);font-size:.68rem;width:38px;text-align:right;color:rgba(245,247,250,.5);}
+.laction{margin-top:20px;padding:14px;background:rgba(5,10,18,.5);border-radius:10px;border-left:3px solid var(--cyan);}
+.laction h4{font-family:var(--fh);font-size:.88rem;font-weight:700;margin-bottom:4px;}
+.laction p{font-size:.75rem;color:rgba(245,247,250,.4);line-height:1.5;}
+
+/* ============ DTx ============ */
+#dtx{background:var(--space);}
+.gabwrap{position:relative;max-width:500px;height:320px;border-radius:14px;overflow:hidden;border:1px solid var(--gb);background:#040810;}
+#gabcanvas{display:block;width:100%;height:100%;}
+.gabtag{position:absolute;top:10px;left:10px;font-family:var(--fm);font-size:.58rem;color:rgba(0,209,255,.6);background:rgba(5,10,18,.8);padding:3px 9px;border-radius:5px;}
+.gabparams{position:absolute;top:10px;right:10px;display:flex;gap:5px;}
+.gptag{font-family:var(--fm);font-size:.55rem;padding:3px 8px;border-radius:5px;border:1px solid rgba(0,209,255,.2);background:rgba(0,209,255,.08);color:var(--cyan);}
+/* 2AFC Game */
+.afc-game{background:rgba(14,27,46,.85);border:1px solid var(--gb);border-radius:14px;padding:24px;}
+.afc-prompt{font-family:var(--fm);font-size:.7rem;color:var(--teal);text-align:center;margin-bottom:16px;letter-spacing:.1em;}
+.afc-choices{display:flex;gap:12px;justify-content:center;}
+.afc-btn{width:100px;height:100px;border-radius:12px;border:1px solid rgba(0,209,255,.25);background:rgba(14,27,46,.7);cursor:none;transition:all .2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
+.afc-btn:hover{border-color:var(--cyan);background:rgba(0,209,255,.06);}
+.afc-btn canvas{border-radius:6px;pointer-events:none;}
+.afc-btn .albl{font-family:var(--fm);font-size:.55rem;color:rgba(245,247,250,.4);}
+.afc-result{text-align:center;margin-top:12px;font-family:var(--fm);font-size:.72rem;min-height:20px;}
+.afc-stats{display:flex;gap:20px;justify-content:center;margin-top:14px;}
+.afc-stat{text-align:center;}
+.afc-stat .av{font-family:var(--fh);font-size:1.2rem;font-weight:800;}
+.afc-stat .al{font-size:.6rem;color:rgba(245,247,250,.35);text-transform:uppercase;}
+/* Threshold chart */
+.trchart{height:130px;background:rgba(5,10,18,.7);border-radius:10px;border:1px solid var(--gb);padding:12px;position:relative;overflow:hidden;margin-top:14px;}
+#tsvg{width:100%;height:100%;}
+
+/* ============ ASSISTIVE ============ */
+#assistive{background:var(--navy);}
+/* WebRTC Simulator */
+.rtcsim{background:rgba(14,27,46,.8);border:1px solid var(--gb);border-radius:18px;padding:28px;}
+.rtcrow{display:flex;gap:20px;align-items:stretch;}
+.phone{width:130px;min-width:130px;background:rgba(7,17,31,.9);border:2px solid rgba(0,209,255,.3);border-radius:22px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.phonelbl{font-family:var(--fm);font-size:.55rem;color:rgba(245,247,250,.35);text-transform:uppercase;letter-spacing:.1em;text-align:center;}
+.phonescr{width:90px;height:120px;border-radius:10px;background:#050c18;border:1px solid rgba(0,209,255,.1);overflow:hidden;position:relative;}
+.camfeed{width:100%;height:100%;object-fit:cover;display:none;}
+.campulse{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--teal);border-radius:50%;animation:cam 1.5s infinite;}
+@keyframes cam{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,198,.4)}50%{opacity:.6;box-shadow:0 0 0 5px rgba(0,255,198,0)}}
+.rtcmid{flex:1;display:flex;flex-direction:column;gap:10px;}
+.rtcstatus{text-align:center;font-family:var(--fm);font-size:.62rem;padding:7px 14px;border-radius:20px;margin-bottom:4px;}
+.st-off{color:rgba(245,247,250,.3);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);}
+.st-on{color:var(--teal);background:rgba(0,255,198,.08);border:1px solid rgba(0,255,198,.2);}
+.st-call{color:var(--cyan);background:rgba(0,209,255,.08);border:1px solid rgba(0,209,255,.2);}
+/* Chat */
+.chat{background:rgba(5,10,18,.7);border-radius:10px;padding:12px;height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.chat::-webkit-scrollbar{width:3px;}
+.chat::-webkit-scrollbar-track{background:transparent;}
+.chat::-webkit-scrollbar-thumb{background:rgba(0,209,255,.2);border-radius:2px;}
+.cmsg{padding:7px 11px;border-radius:9px;font-size:.75rem;max-width:85%;line-height:1.4;}
+.cmsg.patient{background:rgba(139,124,255,.15);border:1px solid rgba(139,124,255,.2);color:rgba(245,247,250,.8);align-self:flex-start;}
+.cmsg.luminary{background:rgba(0,209,255,.1);border:1px solid rgba(0,209,255,.15);color:rgba(245,247,250,.85);align-self:flex-end;}
+.cmsg .csender{font-family:var(--fm);font-size:.52rem;opacity:.5;margin-bottom:2px;}
+.chatinput{display:flex;gap:8px;}
+.chatinput input{flex:1;background:rgba(14,27,46,.8);border:1px solid var(--gb);border-radius:8px;padding:8px 12px;color:var(--smoke);font-size:.78rem;font-family:var(--fb);outline:none;cursor:text;}
+.chatinput input:focus{border-color:rgba(0,209,255,.3);}
+.chatinput button{background:linear-gradient(135deg,var(--cyan),var(--violet));border:none;color:var(--navy);font-weight:700;font-size:.75rem;padding:8px 14px;border-radius:8px;cursor:none;}
+.rtcbtns{display:flex;gap:8px;flex-wrap:wrap;}
+.rtcbtn{font-family:var(--fm);font-size:.65rem;padding:8px 14px;border-radius:8px;border:1px solid;cursor:none;transition:all .2s;}
+.rtcbtn.call{border-color:rgba(0,255,198,.35);color:var(--teal);background:rgba(0,255,198,.06);}
+.rtcbtn.call:hover{background:rgba(0,255,198,.12);}
+.rtcbtn.end{border-color:rgba(255,80,80,.35);color:#FF6060;background:rgba(255,80,80,.06);}
+.rtcbtn.end:hover{background:rgba(255,80,80,.12);}
+.rtcbtn.req{border-color:rgba(139,124,255,.35);color:var(--violet);background:rgba(139,124,255,.06);}
+.rtcbtn.req:hover{background:rgba(139,124,255,.12);}
+.rtclog{font-family:var(--fm);font-size:.6rem;color:rgba(245,247,250,.25);margin-top:6px;line-height:1.8;}
+/* Volunteer Board */
+.volboard{background:rgba(14,27,46,.7);border:1px solid rgba(0,255,198,.15);border-radius:14px;padding:20px;}
+.volrow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;margin-bottom:8px;background:rgba(5,10,18,.4);border:1px solid var(--gb);transition:all .2s;}
+.volrow:hover{border-color:rgba(0,209,255,.2);}
+.volavt{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;font-size:.9rem;border:2px solid rgba(0,255,198,.3);flex-shrink:0;}
+.volinf{flex:1;}
+.volname{font-size:.82rem;font-weight:600;margin-bottom:2px;}
+.volmeta{font-family:var(--fm);font-size:.58rem;color:rgba(245,247,250,.35);}
+.volstatus{font-family:var(--fm);font-size:.6rem;padding:3px 9px;border-radius:10px;}
+.vs-on{background:rgba(0,255,198,.1);color:var(--teal);border:1px solid rgba(0,255,198,.2);}
+.vs-busy{background:rgba(255,183,77,.1);color:#FFB74D;border:1px solid rgba(255,183,77,.2);}
+.vs-off{background:rgba(255,255,255,.04);color:rgba(245,247,250,.3);border:1px solid rgba(255,255,255,.08);}
+
+/* ============ SCIENCE ============ */
+#science{background:linear-gradient(180deg,var(--space),var(--navy));}
+.scicard{background:rgba(14,27,46,.65);border:1px solid var(--gb);border-radius:13px;padding:22px;transition:all .3s;cursor:none;}
+.scicard:hover{border-color:rgba(139,124,255,.25);box-shadow:var(--gv);transform:translateY(-4px);}
+.scitag{font-family:var(--fm);font-size:.58rem;color:var(--violet);text-transform:uppercase;letter-spacing:.15em;margin-bottom:8px;}
+.scicard h3{font-family:var(--fh);font-size:.95rem;font-weight:700;margin-bottom:8px;}
+.scicard p{font-size:.78rem;color:rgba(245,247,250,.45);line-height:1.55;}
+
+/* ============ COMPARISON ============ */
+#comparison{background:var(--space);}
+.cmpgrid{border-radius:14px;overflow:hidden;border:1px solid var(--gb);}
+.cmphdr{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;background:rgba(0,0,0,.3);}
+.cmphdrcell{padding:14px 16px;font-family:var(--fm);font-size:.62rem;color:rgba(245,247,250,.35);text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--gb);}
+.cmphdrcell.hl{background:linear-gradient(135deg,rgba(0,209,255,.08),rgba(139,124,255,.08));color:var(--cyan);}
+.cmprow{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;border-bottom:1px solid rgba(255,255,255,.03);transition:background .2s;}
+.cmprow:hover{background:rgba(0,209,255,.02);}
+.cmprow:last-child{border-bottom:none;}
+.cmpcell{padding:12px 16px;font-size:.8rem;color:rgba(245,247,250,.65);display:flex;align-items:center;}
+.cmpcell.hl{background:rgba(0,209,255,.02);}
+.cmpcell.center{justify-content:center;}
+.ck{color:var(--teal);font-size:1rem;}
+.cx{color:rgba(245,247,250,.15);font-size:1rem;}
+.cp{color:var(--violet);}
+
+/* ============ ROADMAP ============ */
+#roadmap{background:var(--navy);}
+.tline{position:relative;padding-left:36px;margin-top:44px;}
+.tline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:1px;background:linear-gradient(180deg,var(--cyan),var(--violet),transparent);}
+.titem{position:relative;margin-bottom:36px;cursor:none;transition:all .2s;}
+.tdot{position:absolute;left:-31px;top:5px;width:14px;height:14px;border-radius:50%;border:2px solid rgba(0,209,255,.4);background:var(--navy);transition:all .3s;}
+.tdot.done{background:var(--teal);border-color:var(--teal);box-shadow:0 0 16px rgba(0,255,198,.5);}
+.tdot.current{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 16px rgba(0,209,255,.5);animation:tpulse 2s infinite;}
+@keyframes tpulse{0%,100%{box-shadow:0 0 16px rgba(0,209,255,.5)}50%{box-shadow:0 0 30px rgba(0,209,255,.8)}}
+.tphase{font-family:var(--fm);font-size:.6rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.15em;margin-bottom:5px;}
+.ttitle{font-family:var(--fh);font-size:1.05rem;font-weight:700;margin-bottom:6px;}
+.tdesc{font-size:.8rem;color:rgba(245,247,250,.45);line-height:1.55;max-width:480px;}
+.tmetric{display:inline-flex;align-items:center;gap:6px;font-family:var(--fm);font-size:.62rem;background:rgba(0,209,255,.07);border:1px solid rgba(0,209,255,.18);color:var(--cyan);padding:4px 12px;border-radius:20px;margin-top:8px;}
+/* Roadmap expand on click */
+.tdetail{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.titem.open .tdetail{max-height:200px;}
+.titem.open .tdot{transform:scale(1.2);}
+
+/* ============ SMART GOALS ============ */
+#goals{background:var(--space);}
+.goalcard{background:rgba(14,27,46,.7);border:1px solid var(--gb);border-radius:13px;padding:22px;transition:all .3s;}
+.goalcard:hover{border-color:rgba(0,255,198,.2);transform:translateY(-3px);}
+.gnum{font-family:var(--fh);font-size:2rem;font-weight:800;color:var(--teal);}
+.glbl{font-family:var(--fm);font-size:.62rem;color:rgba(245,247,250,.35);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;}
+.gdesc{font-size:.78rem;color:rgba(245,247,250,.45);line-height:1.5;margin-bottom:14px;}
+.pbar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--teal),var(--cyan));border-radius:2px;transition:width 1.2s ease;}
+.ptxt{font-family:var(--fm);font-size:.6rem;color:rgba(245,247,250,.3);margin-top:5px;}
+
+/* ============ IMPACT ============ */
+#impact{background:linear-gradient(135deg,#07111F,#0d1e35,#07111F);text-align:center;padding:110px 40px;}
+.ihead{font-family:var(--fh);font-size:clamp(2.2rem,4.5vw,3.8rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:20px;}
+.ihead .g{background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.istats{display:flex;justify-content:center;gap:56px;margin-top:56px;flex-wrap:wrap;}
+.istat .ib{font-family:var(--fh);font-size:2.8rem;font-weight:800;background:linear-gradient(135deg,var(--teal),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.istat .il{font-size:.72rem;color:rgba(245,247,250,.35);text-transform:uppercase;letter-spacing:.1em;margin-top:4px;}
+
+/* ============ FUTURE ============ */
+#future{background:var(--navy);}
+.fcard{background:rgba(14,27,46,.6);border:1px solid var(--gb);border-radius:13px;padding:24px;position:relative;overflow:hidden;transition:all .3s;}
+.fcard::after{content:'';position:absolute;top:-30px;right:-30px;width:90px;height:90px;background:radial-gradient(var(--violet),transparent 70%);opacity:.12;}
+.fcard:hover{transform:translateY(-4px);border-color:rgba(139,124,255,.2);}
+.fbadge{font-family:var(--fm);font-size:.58rem;background:rgba(139,124,255,.1);color:var(--violet);border:1px solid rgba(139,124,255,.2);padding:3px 10px;border-radius:10px;display:inline-block;margin-bottom:10px;}
+.fcard h3{font-family:var(--fh);font-size:.95rem;font-weight:700;margin-bottom:8px;}
+.fcard p{font-size:.78rem;color:rgba(245,247,250,.45);line-height:1.5;}
+
+/* ============ TEAM ============ */
+#team{background:var(--space);}
+.teamgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:40px;}
+.teamcard{background:rgba(14,27,46,.7);border:1px solid var(--gb);border-radius:14px;padding:24px 16px;text-align:center;transition:all .3s;cursor:none;}
+.teamcard:hover{transform:translateY(-7px);border-color:rgba(0,209,255,.22);box-shadow:0 18px 50px rgba(0,0,0,.4),var(--gc);}
+.tavt{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,rgba(0,209,255,.18),rgba(139,124,255,.18));border:2px solid rgba(0,209,255,.18);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-family:var(--fh);font-size:1.3rem;font-weight:800;color:var(--cyan);position:relative;}
+.tavt::after{content:'';position:absolute;inset:-5px;border-radius:50%;border:1px solid rgba(0,209,255,.08);animation:tr8 8s linear infinite;}
+@keyframes tr8{to{transform:rotate(360deg)}}
+.tname{font-family:var(--fh);font-size:.82rem;font-weight:700;margin-bottom:3px;line-height:1.3;}
+.trole{font-family:var(--fm);font-size:.58rem;color:rgba(245,247,250,.3);text-transform:uppercase;letter-spacing:.1em;}
+.tlead{font-family:var(--fm);font-size:.52rem;background:rgba(0,255,198,.08);color:var(--teal);border:1px solid rgba(0,255,198,.18);padding:3px 8px;border-radius:9px;display:inline-block;margin-top:7px;}
+
+/* ============ CTA ============ */
+#cta{background:linear-gradient(135deg,#07111F,#0d1e35,#07111F);text-align:center;padding:130px 40px;position:relative;overflow:hidden;}
+#cta::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:350px;background:radial-gradient(ellipse,rgba(0,209,255,.05),transparent 70%);pointer-events:none;}
+.ctitle{font-family:var(--fh);font-size:clamp(1.8rem,3.5vw,3rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:20px;max-width:660px;margin-left:auto;margin-right:auto;}
+.ctitle .g{background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.cbtns{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:40px;}
+
+/* FOOTER */
+footer{background:rgba(4,8,16,.85);border-top:1px solid var(--gb);padding:44px 40px 28px;text-align:center;}
+.flogo{font-family:var(--fh);font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:18px;}
+.fteam{font-size:.78rem;color:rgba(245,247,250,.35);line-height:2.1;margin-bottom:18px;}
+.finst{font-family:var(--fm);font-size:.6rem;color:rgba(245,247,250,.2);text-transform:uppercase;letter-spacing:.15em;}
+.fdiv{height:1px;background:linear-gradient(90deg,transparent,rgba(0,209,255,.15),transparent);margin:20px 0;}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  .g2,.g3,.g4{grid-template-columns:1fr;}
+  .teamgrid{grid-template-columns:repeat(2,1fr);}
+  nav{padding:12px 18px;}
+  .nlinks{display:none;}
+  section{padding:64px 20px;}
+  #hero{padding:80px 20px 40px;}
+  h1.htitle{font-size:3.5rem;}
+  .hdash{display:none;}
+  .csgrid{grid-template-columns:repeat(3,1fr);}
+  .sfpanels{grid-template-columns:repeat(3,1fr);}
+  .rtcrow{flex-direction:column;}
+  .phone{width:100%;flex-direction:row;border-radius:14px;}
+  .cmphdr,.cmprow{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){.teamgrid{grid-template-columns:1fr;}}
+
+/* TOAST */
+.toast{position:fixed;bottom:30px;right:30px;background:rgba(14,27,46,.95);border:1px solid rgba(0,209,255,.3);border-radius:12px;padding:14px 20px;font-family:var(--fm);font-size:.7rem;color:var(--cyan);z-index:5000;transform:translateY(100px);opacity:0;transition:all .3s;max-width:280px;}
+.toast.show{transform:translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cur"></div>
+<div class="cring" id="cring"></div>
+<div class="spbar" id="spbar"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="leye"></div>
+  <div class="lt">LENSIGHT</div>
+  <div class="ls">INITIALIZING ECOSYSTEM</div>
+  <div class="lbar-wrap"><div class="lbar" id="lbar"></div></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div style="display:flex;align-items:center">
+    <span class="nlogo">LENSIGHT</span><span class="nbadge">PWA v2</span>
+  </div>
+  <ul class="nlinks">
+    <li><a href="#about">About</a></li>
+    <li><a href="#diagnostic">Diagnostic</a></li>
+    <li><a href="#dtx">DTx</a></li>
+    <li><a href="#assistive">Assistive</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#team">Team</a></li>
+  </ul>
+  <button class="ncta" onclick="scrollTo('#diagnostic')">Run Screening</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="hcanvas"></canvas>
+  <div class="amb" style="width:500px;height:500px;background:var(--cyan);top:-150px;right:-80px;"></div>
+  <div class="amb" style="width:400px;height:400px;background:var(--violet);bottom:-120px;left:-60px;"></div>
+  <div class="hc">
+    <div class="heyebrow">Multimodal Digital Health Ecosystem</div>
+    <div class="htag">From Surgical Intervention to Innovative Digital Solution</div>
+    <h1 class="htitle"><span>LENSIGHT</span></h1>
+    <p class="hsub">Integrating Functional Vision Screening, Neuro-Visual Rehabilitation, and Assistive Technologies in Cataract Management. Zero installation. Browser-native. Community deployable.</p>
+    <div class="hbtns">
+      <button class="bp" onclick="scrollTo('#diagnostic')">▶ Start Functional Screening</button>
+      <button class="bo" onclick="scrollTo('#ecosystem')">Explore Ecosystem</button>
+    </div>
+    <div class="hstats">
+      <div class="hstat"><div class="n" id="cnt94">0M</div><div class="l">Affected Globally</div></div>
+      <div class="hstat"><div class="n" id="cnt45">0%</div><div class="l">Preventable Blindness</div></div>
+      <div class="hstat"><div class="n">5–7</div><div class="l">Min Screening</div></div>
+      <div class="hstat"><div class="n">0</div><div class="l">Install Required</div></div>
+    </div>
+  </div>
+  <div class="hdash" id="hdash">
+    <div class="hdc"><div class="hdcl">LCRI Score</div><div class="hdcv" id="hdlcri" style="color:var(--cyan)">–</div><div class="hdbr"><div class="hdbf" id="hdlcribar" style="background:linear-gradient(90deg,var(--cyan),var(--violet));width:0%"></div></div></div>
+    <div class="hdc"><div class="hdcl">Contrast Sensitivity</div><div class="hdcv" id="hdcs" style="color:var(--teal)">–</div><div class="hdbr"><div class="hdbf" id="hdcsbar" style="background:var(--teal);width:0%"></div></div></div>
+    <div class="hdc"><div class="hdcl">Glare Sensitivity</div><div class="hdcv" id="hdgs" style="color:var(--violet)">–</div><div class="hdbr"><div class="hdbf" id="hdgsbar" style="background:var(--violet);width:0%"></div></div></div>
+    <div class="hdc"><div class="hdcl">Tier Status</div><div class="hdcv" id="hdtier" style="color:rgba(245,247,250,.3);font-size:.85rem;padding-top:5px">NOT TESTED</div></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="g2">
+    <div class="rvl">
+      <div class="stag">The Diagnostic Gap</div>
+      <h2 class="sh">Beyond the <span class="g">Snellen Chart</span></h2>
+      <p class="sdesc" style="margin-bottom:18px">The Snellen chart has been standard for 160+ years — but it measures the wrong thing for cataract. Crystallin protein aggregation scatters light, degrading contrast and introducing glare long before letter resolution declines.</p>
+      <p class="sdesc">LENSIGHT captures four functional parameters that Snellen cannot detect: <strong style="color:var(--teal)">contrast sensitivity</strong>, <strong style="color:var(--cyan)">glare sensitivity</strong>, <strong style="color:var(--violet)">detail recognition</strong>, and <strong style="color:#FFB74D">fog perception</strong>.</p>
+      <div class="tierrow">
+        <div class="tc" style="background:rgba(0,255,198,.06);border:1px solid rgba(0,255,198,.2);">
+          <div class="tn" style="color:var(--teal)">Luminary</div><div class="tr">LCRI 0–35</div>
+          <div class="td">Normal function<br>Annual rescreen</div>
+        </div>
+        <div class="tc" style="background:rgba(0,209,255,.06);border:1px solid rgba(0,209,255,.2);">
+          <div class="tn" style="color:var(--cyan)">Prism</div><div class="tr">LCRI 36–70</div>
+          <div class="td">Early deficit<br>DTx module</div>
+        </div>
+        <div class="tc" style="background:rgba(139,124,255,.06);border:1px solid rgba(139,124,255,.2);">
+          <div class="tn" style="color:var(--violet)">Voyager</div><div class="tr">LCRI 71–100</div>
+          <div class="td">Advanced disability<br>AT + Urgent referral</div>
+        </div>
+      </div>
+    </div>
+    <div class="rvr">
+      <div class="dgap">
+        <div class="stag" style="margin-bottom:10px;">Temporal Divergence — Snellen vs Functional Parameters</div>
+        <p style="font-size:.75rem;color:rgba(245,247,250,.35);margin-bottom:14px;">Functional parameters decline in early cataract while Snellen acuity stays falsely stable</p>
+        <canvas id="divergechart" width="460" height="200" style="width:100%;border-radius:8px;"></canvas>
+        <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;">
+          <span style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:rgba(245,247,250,.5)"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00FFC6"></span>Contrast</span>
+          <span style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:rgba(245,247,250,.5)"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00D1FF"></span>Glare</span>
+          <span style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:rgba(245,247,250,.5)"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#8B7CFF"></span>Detail</span>
+          <span style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:rgba(245,247,250,.5)"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#FFB74D"></span>Fog</span>
+          <span style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:rgba(245,247,250,.5)"><span style="display:inline-block;width:10px;height:3px;background:rgba(245,247,250,.4)"></span>Snellen</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ECOSYSTEM -->
+<section id="ecosystem">
+  <div class="stag rv">Architecture</div>
+  <h2 class="sh rv">The LENSIGHT <span class="g">Ecosystem</span></h2>
+  <p class="sdesc rv" style="margin-bottom:32px">Closed-loop three-module architecture. LCRI tier determines which downstream module activates — forming an integrated care continuum.</p>
+  <canvas id="ecomap" style="width:100%;height:440px;border-radius:16px;border:1px solid var(--gb);display:block;" class="rv"></canvas>
+</section>
+
+<!-- DIAGNOSTIC -->
+<section id="diagnostic">
+  <div class="stag rv">Diagnostic Module</div>
+  <h2 class="sh rv">LENSIGHT <span class="g">Functional Screening</span></h2>
+  <p class="sdesc rv" style="margin-bottom:32px">Complete the four-module assessment below. Your responses are processed by the LCRI algorithm to generate a cataract risk score. <strong style="color:var(--cyan)">All 4 tests are required for LCRI calculation.</strong></p>
+
+  <div class="ttabs">
+    <button class="ttab on" onclick="switchTab(this,'tc-contrast')">① Contrast Sensitivity</button>
+    <button class="ttab" onclick="switchTab(this,'tc-detail')">② Detail Recognition</button>
+    <button class="ttab" onclick="switchTab(this,'tc-glare')">③ Glare Sensitivity</button>
+    <button class="ttab" onclick="switchTab(this,'tc-fog')">④ Fog Perception</button>
+    <button class="ttab" onclick="switchTab(this,'tc-lcri')">📊 LCRI Result</button>
+  </div>
+
+  <!-- TAB 1: CONTRAST -->
+  <div class="tpanel on" id="tc-contrast">
+    <div class="g2">
+      <div>
+        <p style="font-size:.83rem;color:rgba(245,247,250,.5);margin-bottom:8px;line-height:1.6;">Tap the <strong style="color:var(--teal)">lowest row</strong> where you can still clearly identify at least 2 of 3 letters. Rows decrease by 0.15 log units Michelson contrast (Pelli-Robson method).</p>
+        <p style="font-family:var(--fm);font-size:.62rem;color:rgba(245,247,250,.3);margin-bottom:18px;">Viewing distance: 30 cm · Ambient light: 200–500 lux · One eye at a time</p>
+        <div class="csgrid" id="csgrid"></div>
+        <div id="csresult" style="margin-top:14px;padding:12px;background:rgba(14,27,46,.8);border:1px solid var(--gb);border-radius:10px;font-size:.8rem;color:rgba(245,247,250,.4);">
+          Select the lowest row you can read clearly →
+        </div>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;">
+          <button class="bo" onclick="resetTest('contrast')" style="font-size:.72rem;padding:7px 14px;">Reset</button>
+          <button class="bp" id="cs-next" onclick="switchTab(document.querySelectorAll('.ttab')[1],'tc-detail')" style="font-size:.72rem;padding:7px 14px;display:none;">Next: Detail Test →</button>
+        </div>
+      </div>
+      <div class="gc">
+        <div class="stag" style="margin-bottom:10px;">Card A — Front Face</div>
+        <h3 style="font-family:var(--fh);font-size:.95rem;font-weight:700;margin-bottom:12px;">Pelli-Robson Method</h3>
+        <p style="font-size:.78rem;color:rgba(245,247,250,.45);margin-bottom:16px;line-height:1.55;">L = 128 × (1 − Michelson contrast). 10 rows, each 0.15 log units lower. Ink values calibrated with ±0.05 tolerance. 350gsm ICC Fogra39 silk-coated.</p>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(0,255,198,.05);border:1px solid rgba(0,255,198,.12);border-radius:8px;font-size:.75rem;"><span style="color:rgba(245,247,250,.55);">Normal (log CS ≥ 1.50)</span><span style="color:var(--teal);font-family:var(--fm);">Row 1–3</span></div>
+          <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(0,209,255,.05);border:1px solid rgba(0,209,255,.12);border-radius:8px;font-size:.75rem;"><span style="color:rgba(245,247,250,.55);">Mild deficit (1.20–1.49)</span><span style="color:var(--cyan);font-family:var(--fm);">Row 4–6</span></div>
+          <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(139,124,255,.05);border:1px solid rgba(139,124,255,.12);border-radius:8px;font-size:.75rem;"><span style="color:rgba(245,247,250,.55);">Significant deficit (&lt;1.20)</span><span style="color:var(--violet);font-family:var(--fm);">Row 7–10</span></div>
+        </div>
+        <div id="cs-score-display" style="margin-top:14px;padding:12px;background:rgba(5,10,18,.5);border-radius:10px;text-align:center;display:none;">
+          <div style="font-family:var(--fm);font-size:.6rem;color:rgba(245,247,250,.3);margin-bottom:4px;">CS RAW SCORE</div>
+          <div id="cs-score-val" style="font-family:var(--fh);font-size:1.8rem;font-weight:800;color:var(--teal)"></div>
+          <div id="cs-score-lbl" style="font-size:.72rem;color:rgba(245,247,250,.4);margin-top:2px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: DETAIL -->
+  <div class="tpanel" id="tc-detail">
+    <div class="g2">
+      <div>
+        <p style="font-size:.83rem;color:rgba(245,247,250,.5);margin-bottom:8px;line-height:1.6;">Select the <strong style="color:var(--teal)">highest spatial frequency panel</strong> where you can still distinguish the grating pattern. Based on Campbell-Robson contrast sensitivity function.</p>
+        <p style="font-family:var(--fm);font-size:.62rem;color:rgba(245,247,250,.3);margin-bottom:18px;">Viewing distance: 30 cm · Grating width: w = tan(0.5°/f) × 300mm</p>
+        <div class="sfpanels" id="sfpanels"></div>
+        <div id="sfresult" style="margin-top:14px;padding:12px;background:rgba(14,27,46,.8);border:1px solid var(--gb);border-radius:10px;font-size:.8rem;color:rgba(245,247,250,.4);">
+          Click the highest frequency grating you can resolve →
+        </div>
+        <div style="margin-top:12px;display:flex;gap:10px;">
+          <button class="bo" onclick="resetTest('detail')" style="font-size:.72rem;padding:7px 14px;">Reset</button>
+          <button class="bp" id="sf-next" onclick="switchTab(document.querySelectorAll('.ttab')[2],'tc-glare')" style="font-size:.72rem;padding:7px 14px;display:none;">Next: Glare Test →</button>
+        </div>
+      </div>
+      <div class="gc">
+        <div class="stag" style="margin-bottom:10px;">Card A — Rear Face</div>
+        <h3 style="font-family:var(--fh);font-size:.95rem;font-weight:700;margin-bottom:12px;">Campbell-Robson Function</h3>
+        <p style="font-size:.78rem;color:rgba(245,247,250,.45);margin-bottom:16px;line-height:1.55;">6 panels at 1, 2, 4, 8, 12, 16 cpd. &lt;4 cpd = functional deficit. Cataract scatter preferentially degrades mid–high spatial frequencies. LCRI weight: 25%.</p>
+        <div id="sf-score-display" style="padding:14px;background:rgba(5,10,18,.5);border-radius:10px;text-align:center;">
+          <div style="font-family:var(--fm);font-size:.6rem;color:rgba(245,247,250,.3);margin-bottom:4px;">DETAIL RAW SCORE</div>
+          <div id="sf-score-val" style="font-family:var(--fh);font-size:1.8rem;font-weight:800;color:var(--cyan)">–</div>
+          <div id="sf-score-lbl" style="font-size:.72rem;color:rgba(245,247,250,.4);margin-top:2px;">Not yet tested</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: GLARE -->
+  <div class="tpanel" id="tc-glare">
+    <div class="g2">
+      <div>
+        <p style="font-size:.83rem;color:rgba(245,247,250,.5);margin-bottom:8px;line-height:1.6;">Move the slider to match your experience when using Card B with your smartphone LED flashlight at 20cm, 45° angle. C-Quant straylight framework (van den Berg).</p>
+        <div class="glarew" style="margin-bottom:14px;">
+          <div class="gnums">
+            <div class="gnum" id="gn1">4</div>
+            <div class="gnum" id="gn2">2</div>
+            <div class="gnum" id="gn3">7</div>
+            <div class="gnum" id="gn4">9</div>
+          </div>
+          <canvas id="govl" style="position:absolute;inset:0;border-radius:14px;z-index:2;pointer-events:none;"></canvas>
+        </div>
+        <label style="font-family:var(--fm);font-size:.65rem;color:var(--cyan);display:block;margin-bottom:6px;">Glare / Straylight Level: <span id="gval">0</span>%</label>
+        <input type="range" id="gslider" min="0" max="100" value="0" oninput="updateGlare(+this.value)">
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-family:var(--fm);font-size:.58rem;color:rgba(245,247,250,.25);">
+          <span>No glare (log 1.0)</span><span>Max glare (log 1.6)</span>
+        </div>
+        <div id="gresult" style="margin-top:12px;padding:10px;background:rgba(14,27,46,.8);border:1px solid var(--gb);border-radius:10px;font-size:.78rem;color:rgba(245,247,250,.4);">
+          Adjust slider to your glare experience →
+        </div>
+        <div id="glare-target-info" style="margin-top:8px;display:none;">
+          <span class="gtarget-info" style="background:rgba(139,124,255,.1);color:var(--violet);border:1px solid rgba(139,124,255,.2);">Can you still read the numbers above? Record what's still visible.</span>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:10px;">
+          <button class="bo" onclick="resetTest('glare')" style="font-size:.72rem;padding:7px 14px;">Reset</button>
+          <button class="bp" id="g-next" onclick="switchTab(document.querySelectorAll('.ttab')[3],'tc-fog')" style="font-size:.72rem;padding:7px 14px;display:none;">Next: Fog Test →</button>
+        </div>
+      </div>
+      <div class="gc">
+        <div class="stag" style="margin-bottom:10px;">Card B — Glare</div>
+        <h3 style="font-family:var(--fh);font-size:.95rem;font-weight:700;margin-bottom:12px;">Retroreflective Straylight</h3>
+        <p style="font-size:.78rem;color:rgba(245,247,250,.45);margin-bottom:14px;line-height:1.55;">85×54mm, retroreflective microsphere ink RA &gt;500 mcd/lux/m² (3M 680i). Log straylight &gt;1.2 = clinical deficit. 4 targets: log 1.0, 1.2, 1.4, 1.6.</p>
+        <div id="g-score-display" style="padding:14px;background:rgba(5,10,18,.5);border-radius:10px;text-align:center;">
+          <div style="font-family:var(--fm);font-size:.6rem;color:rgba(245,247,250,.3);margin-bottom:4px;">GLARE SCORE (log straylight)</div>
+          <div id="g-score-val" style="font-family:var(--fh);font-size:1.8rem;font-weight:800;color:var(--violet)">–</div>
+          <div id="g-score-lbl" style="font-size:.72rem;color:rgba(245,247,250,.4);margin-top:2px;">Not yet tested</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: FOG -->
+  <div class="tpanel" id="tc-fog">
+    <div class="g2">
+      <div>
+        <p style="font-size:.83rem;color:rgba(245,247,250,.5);margin-bottom:8px;line-height:1.6;">Rate your overall subjective experience of visual fog — the sensation of viewing through fogged glass. VAS &gt;40 indicates abnormal fog perception.</p>
+        <div class="fogw" style="margin-bottom:14px;">
+          <div class="fogscene">
+            <div class="fogcity">🏙</div>
+            <div id="fogvl"></div>
+          </div>
+        </div>
+        <label style="font-family:var(--fm);font-size:.65rem;color:var(--teal);display:block;margin-bottom:6px;">Fog Perception VAS: <span id="fogval">0</span> / 100</label>
+        <input type="range" id="fogslider" min="0" max="100" value="0" oninput="updateFog(+this.value)">
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-family:var(--fm);font-size:.58rem;color:rgba(245,247,250,.25);"><span>0 — Crystal clear</span><span>100 — Dense fog</span></div>
+        <div id="fogresult" style="margin-top:12px;padding:10px;background:rgba(14,27,46,.8);border:1px solid var(--gb);border-radius:10px;font-size:.78rem;color:rgba(245,247,250,.4);">
+          Adjust slider to match your visual experience →
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px;">
+          <button class="bo" onclick="resetTest('fog')" style="font-size:.72rem;padding:7px 14px;">Reset</button>
+          <button class="bp" id="fog-calc" onclick="switchTab(document.querySelectorAll('.ttab')[4],'tc-lcri');calcLCRI()" style="font-size:.72rem;padding:7px 14px;">Calculate LCRI →</button>
+        </div>
+      </div>
+      <div class="gc">
+        <h3 style="font-family:var(--fh);font-size:.95rem;font-weight:700;margin-bottom:12px;">Visual Analogue Scale</h3>
+        <p style="font-size:.78rem;color:rgba(245,247,250,.45);margin-bottom:14px;line-height:1.55;">Administered first in real protocol to prevent anchoring bias. Captures subjective cataract-induced visual fog — hallmark of crystallin aggregate scatter.</p>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <div style="padding:9px 12px;background:rgba(0,255,198,.05);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;font-size:.75rem;"><strong style="color:var(--teal)">VAS 0–40</strong> — Normal range</div>
+          <div style="padding:9px 12px;background:rgba(0,209,255,.05);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;font-size:.75rem;"><strong style="color:var(--cyan)">VAS 41–70</strong> — Mild–moderate fog</div>
+          <div style="padding:9px 12px;background:rgba(139,124,255,.05);border-left:3px solid var(--violet);border-radius:0 8px 8px 0;font-size:.75rem;"><strong style="color:var(--violet)">VAS 71–100</strong> — Severe fog deficit</div>
+        </div>
+        <div id="fog-score-display" style="margin-top:14px;padding:12px;background:rgba(5,10,18,.5);border-radius:10px;text-align:center;">
+          <div style="font-family:var(--fm);font-size:.6rem;color:rgba(245,247,250,.3);margin-bottom:4px;">FOG VAS SCORE</div>
+          <div id="fog-score-val" style="font-family:var(--fh);font-size:1.8rem;font-weight:800;color:#FFB74D">–</div>
+          <div id="fog-score-lbl" style="font-size:.72rem;color:rgba(245,247,250,.4);margin-top:2px;">Not yet recorded</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 5: LCRI -->
+  <div class="tpanel" id="tc-lcri">
+    <div class="g2">
+      <div>
+        <div class="lcribox">
+          <div class="lscore">
+            <div style="font-family:var(--fm);font-size:.6rem;color:rgba(245,247,250,.3);letter-spacing:.2em;margin-bottom:6px;">LENSIGHT CATARACT RISK INDEX</div>
+            <div class="lsnum" id="lcri-num" style="color:rgba(245,247,250,.2)">–</div>
+            <div class="ltbadge" id="lcri-tier" style="opacity:.3">NOT CALCULATED</div>
+          </div>
+          <div id="wbars" style="margin-bottom:20px;">
+            <div class="wrow"><div class="wlbl">Contrast (35%)</div><div class="wtrk"><div class="wfill" id="wf-cs" style="width:0%;background:var(--teal)"></div></div><div class="wpct" id="wp-cs">–</div></div>
+            <div class="wrow"><div class="wlbl">Detail (25%)</div><div class="wtrk"><div class="wfill" id="wf-sf" style="width:0%;background:var(--cyan)"></div></div><div class="wpct" id="wp-sf">–</div></div>
+            <div class="wrow"><div class="wlbl">Glare (20%)</div><div class="wtrk"><div class="wfill" id="wf-g" style="width:0%;background:var(--violet)"></div></div><div class="wpct" id="wp-g">–</div></div>
+            <div class="wrow"><div class="wlbl">Fog (20%)</div><div class="wtrk"><div class="wfill" id="wf-fog" style="width:0%;background:#FFB74D"></div></div><div class="wpct" id="wp-fog">–</div></div>
+          </div>
+          <div class="laction" id="lcri-action" style="opacity:.3">
+            <h4 id="lcri-action-title">Complete all 4 tests first</h4>
+            <p id="lcri-action-desc">Run Contrast → Detail → Glare → Fog tests, then return here.</p>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="bp" onclick="exportReport()" id="btn-export" style="font-size:.72rem;padding:8px 16px;opacity:.3" disabled>📄 Export Report</button>
+            <button class="bo" onclick="resetAll()" style="font-size:.72rem;padding:8px 16px;">↺ Restart All Tests</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="gc" style="margin-bottom:16px;">
+          <h3 style="font-family:var(--fh);font-size:.95rem;font-weight:700;margin-bottom:12px;">LCRI Algorithm</h3>
+          <code style="font-family:var(--fm);font-size:.72rem;color:var(--teal);line-height:1.9;display:block;">LCRI = (CS_score × 0.35)<br>     + (DR_score × 0.25)<br>     + (GS_score × 0.20)<br>     + (FP_score × 0.20)</code>
+          <p style="font-size:.72rem;color:rgba(245,247,250,.35);margin-top:10px;">Range 0–100. Calibrated against LOCS III grading. Each parameter normalized 0–100 before weighting.</p>
+        </div>
+        <div class="gc">
+          <h3 style="font-family:var(--fh);font-size:.95rem;font-weight:700;margin-bottom:12px;">Assessment Summary</h3>
+          <div id="lcri-summary" style="display:flex;flex-direction:column;gap:8px;font-size:.78rem;color:rgba(245,247,250,.4);">
+            <div>Complete all 4 tests to see your assessment summary.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DTx -->
+<section id="dtx">
+  <div class="stag rv">Digital Therapeutics Module</div>
+  <h2 class="sh rv">Gabor Patch <span class="g">Neuro-Visual Training</span></h2>
+  <p class="sdesc rv" style="margin-bottom:36px">For <strong style="color:var(--cyan)">Prism-tier</strong> patients. Interactive 2AFC orientation discrimination task. 3-down/1-up staircase tracks your contrast threshold in real-time. 15 min/day protocol.</p>
+  <div class="g2">
+    <div class="rvl">
+      <div class="gabwrap">
+        <canvas id="gabcanvas"></canvas>
+        <div class="gabtag">● LIVE DTx SIMULATION</div>
+        <div class="gabparams">
+          <span class="gptag" id="gp-sf">4 cpd</span>
+          <span class="gptag" id="gp-ori" style="color:var(--teal)">0°</span>
+          <span class="gptag" id="gp-con" style="color:var(--violet)">40%</span>
+        </div>
+        <div style="position:absolute;bottom:10px;left:10px;right:10px;font-family:var(--fm);font-size:.57rem;color:rgba(245,247,250,.3);">3-down/1-up staircase · 79.4% threshold · Gaussian σ=2° · Phase randomised</div>
+      </div>
+      <!-- GABOR CONTROLS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;">
+        <div>
+          <label style="font-family:var(--fm);font-size:.6rem;color:var(--cyan);display:block;margin-bottom:5px;">Spatial Frequency: <span id="lsf">4</span> cpd</label>
+          <input type="range" id="ksf" min="1" max="12" value="4" step="1" oninput="document.getElementById('lsf').textContent=this.value;renderGabor()">
+        </div>
+        <div>
+          <label style="font-family:var(--fm);font-size:.6rem;color:var(--violet);display:block;margin-bottom:5px;">Contrast: <span id="lcon">40</span>%</label>
+          <input type="range" id="kcon" min="5" max="100" value="40" oninput="document.getElementById('lcon').textContent=this.value;renderGabor()">
+        </div>
+        <div>
+          <label style="font-family:var(--fm);font-size:.6rem;color:var(--teal);display:block;margin-bottom:5px;">Orientation: <span id="lori">0</span>°</label>
+          <input type="range" id="kori" min="0" max="165" value="0" step="15" oninput="document.getElementById('lori').textContent=this.value;renderGabor()">
+        </div>
+        <div>
+          <label style="font-family:var(--fm);font-size:.6rem;color:#FFB74D;display:block;margin-bottom:5px;">Sigma: <span id="lsig">2</span>°</label>
+          <input type="range" id="ksig" min="1" max="5" value="2" step=".5" oninput="document.getElementById('lsig').textContent=this.value;renderGabor()">
+        </div>
+      </div>
+      <div class="trchart">
+        <div style="font-family:var(--fm);font-size:.58rem;color:rgba(245,247,250,.25);position:absolute;top:8px;left:10px;">Contrast Threshold History</div>
+        <svg id="tsvg" style="width:100%;height:100%;margin-top:14px;"></svg>
+      </div>
+    </div>
+    <div class="rvr">
+      <!-- 2AFC GAME -->
+      <div class="afc-game">
+        <div class="afc-prompt" id="afc-prompt">WHICH SIDE HAS THE TILTED GRATING?</div>
+        <div class="afc-choices">
+          <button class="afc-btn" onclick="afcAnswer('left')" id="afc-left">
+            <canvas id="afc-lcanvas" width="70" height="70"></canvas>
+            <div class="albl">← LEFT</div>
+          </button>
+          <button class="afc-btn" onclick="afcAnswer('right')" id="afc-right">
+            <canvas id="afc-rcanvas" width="70" height="70"></canvas>
+            <div class="albl">RIGHT →</div>
+          </button>
+        </div>
+        <div class="afc-result" id="afc-result"></div>
+        <div class="afc-stats">
+          <div class="afc-stat"><div class="av" id="afc-trial" style="color:var(--cyan)">0</div><div class="al">Trial</div></div>
+          <div class="afc-stat"><div class="av" id="afc-correct" style="color:var(--teal)">0</div><div class="al">Correct</div></div>
+          <div class="afc-stat"><div class="av" id="afc-streak" style="color:var(--violet)">0</div><div class="al">Streak</div></div>
+          <div class="afc-stat"><div class="av" id="afc-threshold" style="color:#FFB74D">–</div><div class="al">Threshold</div></div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="bo" onclick="resetAFC()" style="font-size:.7rem;padding:7px 13px;">Reset Game</button>
+          <button class="bp" onclick="autoRunAFC()" style="font-size:.7rem;padding:7px 13px;" id="autorun-btn">Auto Demo</button>
+        </div>
+        <div style="margin-top:12px;padding:10px;background:rgba(5,10,18,.5);border-radius:8px;font-size:.72rem;color:rgba(245,247,250,.35);line-height:1.5;">
+          <strong style="color:var(--teal)">Staircase rule:</strong> 3 correct → contrast −10% (harder) · 1 wrong → contrast +15% (easier). Tracks 79.4% correct threshold.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ASSISTIVE -->
+<section id="assistive">
+  <div class="stag rv">Assistive Technology Module</div>
+  <h2 class="sh rv">Luminary <span class="g">Volunteer Network</span></h2>
+  <p class="sdesc rv" style="margin-bottom:36px">For <strong style="color:var(--violet)">Voyager-tier</strong> patients. Encrypted WebRTC peer-to-peer connection with trained Luminary volunteers. Zero installation — browser native.</p>
+  <div class="g2">
+    <div class="rvl">
+      <div class="rtcsim">
+        <div id="rtcstatus" class="rtcstatus st-off">● WEBRTC — NOT CONNECTED</div>
+        <div class="rtcrow" style="margin-bottom:14px;">
+          <div class="phone">
+            <div class="phonelbl">VOYAGER<br>Patient</div>
+            <div class="phonescr">
+              <canvas id="patcam" width="90" height="120" style="width:100%;height:100%;display:block;"></canvas>
+              <div class="campulse" id="patpulse" style="display:none;"></div>
+            </div>
+          </div>
+          <div class="rtcmid">
+            <div class="rtcbtns">
+              <button class="rtcbtn call" onclick="rtcConnect()">📞 Connect to Luminary</button>
+              <button class="rtcbtn end" onclick="rtcDisconnect()">✕ End Session</button>
+              <button class="rtcbtn req" onclick="rtcRequest('obstacle')">🚧 Obstacle Alert</button>
+              <button class="rtcbtn req" onclick="rtcRequest('read')">📄 Help Reading</button>
+              <button class="rtcbtn req" onclick="rtcRequest('navigate')">🗺 Navigation</button>
+            </div>
+            <div class="chat" id="rtcchat">
+              <div class="cmsg patient"><div class="csender">SYSTEM</div>Press "Connect to Luminary" to start a session.</div>
+            </div>
+            <div class="chatinput">
+              <input type="text" id="chatmsg" placeholder="Type a message to Luminary..." onkeydown="if(event.key==='Enter')sendChat()">
+              <button onclick="sendChat()">Send</button>
+            </div>
+          </div>
+          <div class="phone">
+            <div class="phonelbl">LUMINARY<br>Volunteer</div>
+            <div class="phonescr">
+              <canvas id="lumcam" width="90" height="120" style="width:100%;height:100%;display:block;"></canvas>
+              <div class="campulse" id="lumpulse" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+        <div id="rtclog" class="rtclog">Encrypted P2P · Node.js Socket.io signalling · No server AV intermediation</div>
+      </div>
+    </div>
+    <div class="rvr">
+      <div class="volboard">
+        <div style="font-family:var(--fm);font-size:.65rem;color:var(--teal);margin-bottom:14px;letter-spacing:.1em;">LUMINARY VOLUNTEER BOARD</div>
+        <div id="volboard"></div>
+        <div style="margin-top:14px;padding:12px;background:rgba(5,10,18,.4);border-radius:10px;">
+          <div style="font-family:var(--fm);font-size:.6rem;color:rgba(245,247,250,.3);margin-bottom:6px;">NETWORK STATUS</div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;">
+            <div style="text-align:center;"><div id="vol-online" style="font-family:var(--fh);font-size:1.4rem;font-weight:800;color:var(--teal)">0</div><div style="font-size:.6rem;color:rgba(245,247,250,.3)">Online</div></div>
+            <div style="text-align:center;"><div id="vol-busy" style="font-family:var(--fh);font-size:1.4rem;font-weight:800;color:#FFB74D">0</div><div style="font-size:.6rem;color:rgba(245,247,250,.3)">Busy</div></div>
+            <div style="text-align:center;"><div id="vol-sessions" style="font-family:var(--fh);font-size:1.4rem;font-weight:800;color:var(--cyan)">0</div><div style="font-size:.6rem;color:rgba(245,247,250,.3)">Sessions Today</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCIENCE -->
+<section id="science">
+  <div class="stag rv">Clinical Science</div>
+  <h2 class="sh rv">Scientific <span class="g">Foundation</span></h2>
+  <div class="g3 rv" style="margin-top:36px;">
+    <div class="scicard"><div class="scitag">Contrast</div><h3>Pelli-Robson (1988)</h3><p>10-row log contrast array. L = 128×(1−MC). Log CS &lt;1.50 = deficit. Michelson contrast calibration, ±0.05 tolerance. 35% LCRI weight.</p></div>
+    <div class="scicard"><div class="scitag">Spatial Frequency</div><h3>Campbell-Robson (1968)</h3><p>CSF across 1–16 cpd. Cataract scatter preferentially degrades mid–high SF. &lt;4 cpd resolution = functional deficit. 25% LCRI weight.</p></div>
+    <div class="scicard"><div class="scitag">Glare</div><h3>C-Quant (van den Berg)</h3><p>Straylight framework. Retroreflective RA &gt;500 mcd/lux/m². Log straylight &gt;1.2 = clinical deficit. 4 calibrated glare targets. 20% LCRI weight.</p></div>
+    <div class="scicard"><div class="scitag">Grading</div><h3>LOCS III Calibration</h3><p>Lens Opacities Classification System III gold standard. LCRI tier boundaries from regression modelling vs LOCS III grades by fellowship-trained ophthalmologists.</p></div>
+    <div class="scicard"><div class="scitag">Neuroplasticity</div><h3>V1 Perceptual Learning</h3><p>Near-threshold Gabor exposure induces long-term synaptic potentiation in V1 and extrastriate areas. Durable improvements in contrast sensitivity through perceptual learning.</p></div>
+    <div class="scicard"><div class="scitag">Gabor Function</div><h3>V1 Simple Cell Activation</h3><p>Orientation-selective V1 simple cells approximate the Gabor function. Sinusoidal grating × Gaussian envelope. Phase randomised per trial prevents anticipation.</p></div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section id="comparison">
+  <div class="stag rv">Comparative Advantages</div>
+  <h2 class="sh rv">LENSIGHT <span class="g">vs. Existing Tools</span></h2>
+  <div class="cmpgrid rv" style="margin-top:32px;">
+    <div class="cmphdr">
+      <div class="cmphdrcell">Feature</div>
+      <div class="cmphdrcell">Snellen Chart</div>
+      <div class="cmphdrcell">Existing mHealth</div>
+      <div class="cmphdrcell hl">LENSIGHT ✦</div>
+    </div>
+    <div class="cmprow"><div class="cmpcell">Contrast sensitivity detection</div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell hl center"><span class="ck">✓</span></div></div>
+    <div class="cmprow"><div class="cmpcell">Glare sensitivity (C-Quant)</div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell hl center"><span class="ck">✓</span></div></div>
+    <div class="cmprow"><div class="cmpcell">Detail recognition (spatial frequency)</div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell hl center"><span class="ck">✓</span></div></div>
+    <div class="cmprow"><div class="cmpcell">Fog perception (VAS)</div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell hl center"><span class="ck">✓</span></div></div>
+    <div class="cmprow"><div class="cmpcell">Quantified risk index (LCRI)</div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell center"><span class="cp">⟁ partial</span></div><div class="cmpcell hl center"><span class="ck">✓</span> LOCS III</div></div>
+    <div class="cmprow"><div class="cmpcell">Neuro-visual rehabilitation (DTx)</div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell hl center"><span class="ck">✓</span> Gabor</div></div>
+    <div class="cmprow"><div class="cmpcell">Real-time assistive (WebRTC)</div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell hl center"><span class="ck">✓</span> P2P</div></div>
+    <div class="cmprow"><div class="cmpcell">Zero installation (PWA + QR)</div><div class="cmpcell center" style="font-size:.72rem;color:rgba(245,247,250,.3)">N/A</div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell hl center"><span class="ck">✓</span></div></div>
+    <div class="cmprow"><div class="cmpcell">Posyandu community deployment</div><div class="cmpcell center" style="font-size:.72rem;color:rgba(245,247,250,.3)">Limited</div><div class="cmpcell center"><span class="cp">⟁ partial</span></div><div class="cmpcell hl center"><span class="ck">✓</span></div></div>
+    <div class="cmprow"><div class="cmpcell">Physical validated instrument</div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell center"><span class="cx">✕</span></div><div class="cmpcell hl center"><span class="ck">✓</span> Printed</div></div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section id="roadmap">
+  <div class="stag rv">Development Roadmap</div>
+  <h2 class="sh rv">Path to <span class="g">National Scale</span></h2>
+  <p class="sdesc rv" style="margin-bottom:8px;">Click each phase to expand details.</p>
+  <div class="tline" id="tline"></div>
+</section>
+
+<!-- GOALS -->
+<section id="goals">
+  <div class="stag rv">SMART Goals Dashboard</div>
+  <h2 class="sh rv">Clinical <span class="g">Milestones</span></h2>
+  <div class="g3" style="margin-top:36px;" id="goalsGrid"></div>
+</section>
+
+<!-- IMPACT -->
+<section id="impact">
+  <div class="stag" style="justify-content:center;margin-bottom:16px;">Human Impact</div>
+  <div class="ihead"><span class="g">Cataract is solvable.</span><br>Blindness should not be inevitable.</div>
+  <p style="color:rgba(245,247,250,.45);max-width:560px;margin:0 auto 16px;line-height:1.7;font-size:.9rem;">In rural Indonesia, the gap between early-stage cataract and surgical intervention spans months to years. LENSIGHT fills this gap — with science, technology, and human connection.</p>
+  <div class="istats">
+    <div class="istat"><div class="ib" id="i94">94M</div><div class="il">People with cataract</div></div>
+    <div class="istat"><div class="ib">45%</div><div class="il">Of all blindness</div></div>
+    <div class="istat"><div class="ib">5–7</div><div class="il">Minute screening</div></div>
+    <div class="istat"><div class="ib">0</div><div class="il">Install required</div></div>
+  </div>
+</section>
+
+<!-- FUTURE -->
+<section id="future">
+  <div class="stag rv">Future Expansion</div>
+  <h2 class="sh rv">Beyond <span class="g">Cataract</span></h2>
+  <div class="g4 rv" style="margin-top:32px;">
+    <div class="fcard"><div class="fbadge">2026–27</div><h3>Glaucoma Screening</h3><p>Peripheral contrast sensitivity adapted for glaucomatous field defect detection.</p></div>
+    <div class="fcard"><div class="fbadge">2027</div><h3>AMD Screening</h3><p>Central scotoma detection via modified spatial frequency panels for macular degeneration.</p></div>
+    <div class="fcard"><div class="fbadge">2027–28</div><h3>AI Trajectory Prediction</h3><p>Longitudinal LCRI data enables predictive modelling — flagging rapid progressors early.</p></div>
+    <div class="fcard"><div class="fbadge">2028+</div><h3>National Surveillance</h3><p>Epidemiological mapping of cataract burden across Indonesian provinces. WHO SEARO partnership.</p></div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team">
+  <div class="stag rv">Research Team</div>
+  <h2 class="sh rv">Faculty of Medicine<br><span class="g">Universitas Diponegoro</span></h2>
+  <div class="teamgrid">
+    <div class="teamcard rv"><div class="tavt">J</div><div class="tname">Joana Alya Varojahan Sinaga</div><div class="trole">Research Lead</div><div class="tlead">Team Leader</div></div>
+    <div class="teamcard rv"><div class="tavt" style="color:var(--teal);border-color:rgba(0,255,198,.25);">K</div><div class="tname">Keyshasi Cintanaya Sakti</div><div class="trole">Member</div></div>
+    <div class="teamcard rv"><div class="tavt" style="color:var(--violet);border-color:rgba(139,124,255,.25);">D</div><div class="tname">Devan Syauqi Fathi</div><div class="trole">Member</div></div>
+    <div class="teamcard rv"><div class="tavt" style="color:#FFB74D;border-color:rgba(255,183,77,.25);">N</div><div class="tname">Naufa Nufail</div><div class="trole">Member</div></div>
+    <div class="teamcard rv"><div class="tavt" style="color:var(--teal);border-color:rgba(0,255,198,.25);">K</div><div class="tname">Keitaro Syathir Rafif Haryono</div><div class="trole">Member</div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="stag" style="justify-content:center;margin-bottom:18px;">ISF 2026 · Diponegoro University</div>
+  <h2 class="ctitle">Redefining Vision Care Through <span class="g">Science, Technology, and Humanity.</span></h2>
+  <p style="color:rgba(245,247,250,.4);font-size:.9rem;">Clinical validity and contextual accessibility are not competing objectives. LENSIGHT is the proof.</p>
+  <div class="cbtns">
+    <button class="bp" onclick="scrollTo('#diagnostic')">▶ Launch Screening</button>
+    <button class="bo" onclick="exportReport()">↓ Export Report</button>
+    <button class="bo" style="border-color:rgba(0,255,198,.35);color:var(--teal);" onclick="scrollTo('#assistive')">★ Join Luminary Network</button>
+  </div>
+</section>
+
+<footer>
+  <div class="flogo">LENSIGHT</div>
+  <div class="fteam">Joana Alya Varojahan Sinaga &nbsp;·&nbsp; Keyshasi Cintanaya Sakti &nbsp;·&nbsp; Devan Syauqi Fathi<br>Naufa Nufail &nbsp;·&nbsp; Keitaro Syathir Rafif Haryono</div>
+  <div class="finst">Fakultas Kedokteran · Universitas Diponegoro · Semarang · 2026</div>
+  <div class="fdiv"></div>
+  <div style="font-family:var(--fm);font-size:.58rem;color:rgba(245,247,250,.12);">LENSIGHT · International Student Festival 2026 · Multimodal Digital Health Ecosystem</div>
+</footer>
+
+<script>
+// ===== STATE =====
+const S = {
+  cs: null, sf: null, glare: null, fog: null,
+  glareVal: 0, fogVal: 0,
+  afc: { trial:0, correct:0, streak:0, consec:0, contrast:40, history:[], answer:null, targetOri:0 },
+  rtc: { connected:false, callActive:false },
+  sessionCount: 0
+};
+
+// ===== CURSOR =====
+const cur=document.getElementById('cur'), cring=document.getElementById('cring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+setInterval(()=>{rx+=(mx-rx)*.14;ry+=(my-ry)*.14;cring.style.left=rx+'px';cring.style.top=ry+'px';},16);
+
+// ===== SCROLL BAR =====
+window.addEventListener('scroll',()=>{
+  const p=document.getElementById('spbar');
+  p.style.width=(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight)*100)+'%';
+});
+
+// ===== LOADER =====
+let lp=0;
+const li=setInterval(()=>{lp=Math.min(lp+(Math.random()*12+4),100);document.getElementById('lbar').style.width=lp+'%';if(lp>=100){clearInterval(li);setTimeout(()=>{document.getElementById('loader').classList.add('gone');initAll();},400);}},120);
+
+// ===== SCROLL HELPER =====
+function scrollTo(sel){document.querySelector(sel)?.scrollIntoView({behavior:'smooth',block:'start'});}
+
+// ===== TOAST =====
+function toast(msg,dur=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+
+// ===== REVEAL =====
+const ro=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on');}),{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rv,.rvl,.rvr').forEach(el=>ro.observe(el));
+
+// ===== HERO CANVAS =====
+function initHeroCanvas(){
+  const cv=document.getElementById('hcanvas'),ctx=cv.getContext('2d');
+  function sz(){cv.width=window.innerWidth;cv.height=window.innerHeight;}sz();
+  window.addEventListener('resize',sz);
+  const pts=Array.from({length:100},()=>({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,r:Math.random()*1.2+.3,o:Math.random()*.35+.08}));
+  let t=0;
+  (function loop(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    // Eye/retina
+    const cx=cv.width*.8,cy=cv.height*.5;
+    for(let r=60;r<280;r+=45){
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(0,209,255,${.025+Math.sin(t*.01+r*.04)*.01})`;
+      ctx.lineWidth=1;ctx.stroke();
+    }
+    const g=ctx.createRadialGradient(cx,cy,0,cx,cy,110);
+    g.addColorStop(0,'rgba(0,209,255,.1)');g.addColorStop(.6,'rgba(139,124,255,.05)');g.addColorStop(1,'transparent');
+    ctx.beginPath();ctx.arc(cx,cy,110,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+    // Pupils
+    ctx.beginPath();ctx.arc(cx,cy,28+Math.sin(t*.02)*2,0,Math.PI*2);ctx.fillStyle='rgba(0,209,255,.12)';ctx.fill();
+    // Neural spokes
+    for(let i=0;i<10;i++){
+      const a=i/10*Math.PI*2+t*.004,l=70+Math.sin(t*.015+i)*25;
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*l,cy+Math.sin(a)*l);
+      ctx.strokeStyle=`rgba(0,255,198,${.06+Math.sin(t*.02+i)*.025})`;ctx.lineWidth=.6;ctx.stroke();
+    }
+    pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=cv.width;if(p.x>cv.width)p.x=0;if(p.y<0)p.y=cv.height;if(p.y>cv.height)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(0,209,255,${p.o})`;ctx.fill();});
+    // Connections
+    for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<90){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(0,209,255,${.04*(1-d/90)})`;ctx.lineWidth=.5;ctx.stroke();}}
+    t++;requestAnimationFrame(loop);
+  })();
+}
+
+// ===== COUNT UP =====
+function countUp(id,target,suffix,dur=1800){
+  let s=0,st=null;const el=document.getElementById(id);
+  function step(ts){if(!st)st=ts;const prog=Math.min((ts-st)/dur,1);el.textContent=Math.round(prog*target)+suffix;if(prog<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+
+// ===== DIVERGENCE CHART =====
+function drawDiverge(){
+  const cv=document.getElementById('divergechart'),ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.fillStyle='rgba(14,27,46,.3)';ctx.fillRect(0,0,W,H);
+  // Grid
+  ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1;
+  for(let y=20;y<H;y+=35){ctx.beginPath();ctx.moveTo(30,y);ctx.lineTo(W-10,y);ctx.stroke();}
+  // Axes labels
+  const stages=['Pre','Early','Mid','Late'];
+  const xs=[50,150,280,410];
+  stages.forEach((s,i)=>{ctx.fillStyle='rgba(245,247,250,.25)';ctx.font='10px JetBrains Mono,monospace';ctx.textAlign='center';ctx.fillText(s,xs[i],H-5);});
+  // Snellen (stable)
+  const snl=[[50,40],[150,38],[280,36],[410,35]];
+  // Functional (decline)
+  const cs=[[50,38],[150,90],[280,148],[410,175]];
+  const gl=[[50,35],[150,82],[280,138],[410,168]];
+  const dt=[[50,36],[150,78],[280,132],[410,160]];
+  const fg=[[50,32],[150,68],[280,120],[410,148]];
+  function path(pts,color,dash){
+    ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]));
+    ctx.strokeStyle=color;ctx.lineWidth=2.2;if(dash)ctx.setLineDash([8,5]);else ctx.setLineDash([]);ctx.stroke();ctx.setLineDash([]);
+    pts.forEach(p=>{ctx.beginPath();ctx.arc(p[0],p[1],3.5,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();});
+  }
+  path(snl,'rgba(245,247,250,.4)',true);
+  path(cs,'#00FFC6');path(gl,'#00D1FF');path(dt,'#8B7CFF');path(fg,'#FFB74D');
+  // Annotation
+  ctx.fillStyle='rgba(245,247,250,.3)';ctx.font='9px JetBrains Mono,monospace';ctx.textAlign='left';
+  ctx.fillText('Snellen (stable)',snl[snl.length-1][0]+5,snl[snl.length-1][1]+4);
+  ctx.fillStyle='rgba(0,255,198,.7)';ctx.fillText('Contrast↓',cs[1][0],cs[1][1]-8);
+}
+
+// ===== ECOSYSTEM CANVAS =====
+function initEco(){
+  const cv=document.getElementById('ecomap'),ctx=cv.getContext('2d');
+  cv.width=cv.parentElement.clientWidth;cv.height=440;
+  window.addEventListener('resize',()=>{cv.width=cv.parentElement.clientWidth;});
+  const W=()=>cv.width,H=440;
+  const nodes=[
+    {id:'patient',label:['PATIENT'],x:.5,y:.07,color:'#00FFC6',r:28,icon:'👤'},
+    {id:'cards',label:['CARD SET','A + B'],x:.5,y:.22,color:'#00D1FF',r:24},
+    {id:'qr',label:['QR SCAN','PWA'],x:.5,y:.38,color:'#8B7CFF',r:22},
+    {id:'lcri',label:['LCRI','ALGORITHM'],x:.5,y:.55,color:'#00D1FF',r:26},
+    {id:'lum',label:['LUMINARY','0–35'],x:.2,y:.78,color:'#00FFC6',r:24},
+    {id:'prism',label:['PRISM','36–70'],x:.5,y:.78,color:'#00D1FF',r:24},
+    {id:'voy',label:['VOYAGER','71–100'],x:.8,y:.78,color:'#8B7CFF',r:24},
+    {id:'mon',label:['Monitor'],x:.12,y:.95,color:'rgba(0,255,198,.5)',r:18},
+    {id:'dtx',label:['DTx'],x:.5,y:.95,color:'rgba(0,209,255,.5)',r:18},
+    {id:'at',label:['AT+Ref'],x:.88,y:.95,color:'rgba(139,124,255,.5)',r:18},
+  ];
+  const edges=[['patient','cards'],['cards','qr'],['qr','lcri'],['lcri','lum'],['lcri','prism'],['lcri','voy'],['lum','mon'],['prism','dtx'],['voy','at']];
+  const pulses=edges.map(e=>({e,t:Math.random(),spd:.006+Math.random()*.004}));
+  let t=0;
+  function gp(n){return{x:n.x*W(),y:n.y*H};}
+  function bezCP(a,b){return{x:(a.x+b.x)/2,y:(a.y+b.y)/2};}
+  (function loop(){
+    ctx.clearRect(0,0,W(),H);
+    // Background glow
+    const gr=ctx.createRadialGradient(W()*.5,H*.5,0,W()*.5,H*.5,300);
+    gr.addColorStop(0,'rgba(0,209,255,.02)');gr.addColorStop(1,'transparent');
+    ctx.fillStyle=gr;ctx.fillRect(0,0,W(),H);
+    // Edges
+    edges.forEach(([a,b])=>{
+      const na=nodes.find(n=>n.id===a),nb=nodes.find(n=>n.id===b);
+      const pa=gp(na),pb=gp(nb);
+      ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);
+      ctx.strokeStyle='rgba(0,209,255,.1)';ctx.lineWidth=1.5;ctx.setLineDash([7,6]);ctx.lineDashOffset=-t*.6;ctx.stroke();ctx.setLineDash([]);
+    });
+    // Pulses
+    pulses.forEach(p=>{
+      p.t=(p.t+p.spd)%1;
+      const [a,b]=p.e;
+      const na=nodes.find(n=>n.id===a),nb=nodes.find(n=>n.id===b);
+      const pa=gp(na),pb=gp(nb);
+      const x=pa.x+(pb.x-pa.x)*p.t,y=pa.y+(pb.y-pa.y)*p.t;
+      ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle='rgba(0,209,255,.9)';ctx.fill();
+      ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fillStyle='rgba(0,209,255,.15)';ctx.fill();
+    });
+    // Nodes
+    nodes.forEach(n=>{
+      const p=gp(n);
+      ctx.beginPath();ctx.arc(p.x,p.y,n.r*2,0,Math.PI*2);ctx.fillStyle='rgba(0,209,255,.03)';ctx.fill();
+      ctx.beginPath();ctx.arc(p.x,p.y,n.r,0,Math.PI*2);ctx.fillStyle='rgba(14,27,46,.95)';ctx.fill();
+      ctx.strokeStyle=n.color;ctx.lineWidth=1.8;ctx.stroke();
+      ctx.fillStyle=n.color;ctx.font='bold 10px Syne,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      n.label.forEach((l,i)=>ctx.fillText(l,p.x,p.y+(i-(n.label.length-1)/2)*13));
+    });
+    t++;requestAnimationFrame(loop);
+  })();
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(el,id){
+  document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.tpanel').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById(id)?.classList.add('on');
+}
+
+// ===== BUILD CONTRAST GRID =====
+function buildCS(){
+  const grid=document.getElementById('csgrid');grid.innerHTML='';
+  const chars='HNRKDZCVSOB';
+  const rows=10;
+  for(let r=0;r<rows;r++){
+    const cs=r*0.15; // log units above 0 = higher row index means lower contrast
+    const mc=Math.pow(10,-cs); // Michelson contrast fraction approx
+    const opacity=Math.max(mc,0.02);
+    for(let c=0;c<3;c++){
+      const cell=document.createElement('div');cell.className='cscell';
+      cell.style.color=`rgba(245,247,250,${opacity})`;
+      cell.style.border=`1px solid rgba(245,247,250,${opacity*.3})`;
+      cell.textContent=chars[Math.floor(Math.random()*chars.length)];
+      cell.dataset.row=r;cell.dataset.cs=(1.35-cs).toFixed(2);
+      cell.onclick=()=>selectCS(r,cell);
+      grid.appendChild(cell);
+    }
+  }
+}
+function selectCS(row,cell){
+  document.querySelectorAll('.cscell').forEach(c=>c.classList.remove('sel'));
+  // Select this row and all above
+  document.querySelectorAll(`.cscell[data-row="${row}"]`).forEach(c=>c.classList.add('sel'));
+  const logCS=+cell.dataset.cs;
+  // Normalize: logCS 1.35 = best (score 0), logCS 0.00 = worst (score 100)
+  const rawScore=Math.round((1-(logCS/1.35))*100);
+  S.cs=rawScore;
+  const lbl=logCS>=1.50?'Normal':(logCS>=1.20?'Mild deficit':'Significant deficit');
+  document.getElementById('csresult').innerHTML=`<strong style="color:var(--teal)">Row ${row+1} selected</strong> — log CS ${logCS} — ${lbl} — <strong>CS Score: ${rawScore}/100</strong>`;
+  document.getElementById('cs-score-display').style.display='block';
+  document.getElementById('cs-score-val').textContent=rawScore;
+  document.getElementById('cs-score-lbl').textContent=`log CS ${logCS} · ${lbl}`;
+  document.getElementById('cs-next').style.display='inline-block';
+  updateHeroDash();toast(`✓ Contrast test recorded: log CS ${logCS}`);
+}
+function resetTest(t){
+  if(t==='contrast'){S.cs=null;buildCS();document.getElementById('csresult').innerHTML='Select the lowest row you can read clearly →';document.getElementById('cs-score-display').style.display='none';document.getElementById('cs-next').style.display='none';}
+  if(t==='detail'){S.sf=null;buildSF();document.getElementById('sfresult').innerHTML='Click the highest frequency grating you can resolve →';document.getElementById('sf-score-val').textContent='–';document.getElementById('sf-score-lbl').textContent='Not yet tested';document.getElementById('sf-next').style.display='none';}
+  if(t==='glare'){S.glare=null;S.glareVal=0;document.getElementById('gslider').value=0;updateGlare(0);document.getElementById('g-next').style.display='none';}
+  if(t==='fog'){S.fog=null;S.fogVal=0;document.getElementById('fogslider').value=0;updateFog(0);document.getElementById('fog-score-val').textContent='–';document.getElementById('fog-score-lbl').textContent='Not yet recorded';}
+  updateHeroDash();
+}
+function resetAll(){
+  resetTest('contrast');resetTest('detail');resetTest('glare');resetTest('fog');
+  document.getElementById('lcri-num').textContent='–';document.getElementById('lcri-num').style.color='rgba(245,247,250,.2)';
+  document.getElementById('lcri-tier').textContent='NOT CALCULATED';document.getElementById('lcri-tier').style.opacity='.3';
+  document.getElementById('lcri-action').style.opacity='.3';
+  ['wf-cs','wf-sf','wf-g','wf-fog'].forEach(id=>document.getElementById(id).style.width='0%');
+  ['wp-cs','wp-sf','wp-g','wp-fog'].forEach(id=>document.getElementById(id).textContent='–');
+  document.getElementById('btn-export').disabled=true;document.getElementById('btn-export').style.opacity='.3';
+  document.getElementById('lcri-summary').innerHTML='<div>Complete all 4 tests to see your assessment summary.</div>';
+  switchTab(document.querySelectorAll('.ttab')[0],'tc-contrast');
+  updateHeroDash();toast('↺ All tests reset');
+}
+
+// ===== SPATIAL FREQ PANELS =====
+function buildSF(){
+  const container=document.getElementById('sfpanels');container.innerHTML='';
+  const freqs=[1,2,4,8,12,16];
+  freqs.forEach((f,idx)=>{
+    const wrap=document.createElement('div');wrap.className='sfp';
+    const cv=document.createElement('canvas');cv.width=80;cv.height=80;
+    const ctx=cv.getContext('2d');
+    const img=ctx.createImageData(80,80);
+    for(let y=0;y<80;y++)for(let x=0;x<80;x++){
+      const cycle=f/8;
+      const sine=Math.sin(2*Math.PI*cycle*x/80)*0.5+0.5;
+      const gauss=Math.exp(-((x-40)**2+(y-40)**2)/(2*18**2));
+      const v=Math.round((sine*gauss*0.75+0.12)*255);
+      const i=(y*80+x)*4;
+      img.data[i]=Math.round(v*.18);img.data[i+1]=Math.round(v*.6+18*gauss);img.data[i+2]=Math.round(v*.95+12*gauss);img.data[i+3]=255;
+    }
+    ctx.putImageData(img,0,0);
+    wrap.appendChild(cv);
+    const lbl=document.createElement('div');lbl.className='sfl';lbl.textContent=f+' cpd';wrap.appendChild(lbl);
+    wrap.dataset.f=f;wrap.dataset.idx=idx;
+    wrap.onclick=()=>selectSF(idx,f,wrap);
+    container.appendChild(wrap);
+  });
+}
+function selectSF(idx,f,el){
+  document.querySelectorAll('.sfp').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+  // score: higher cpd resolved = better. 16cpd=0 deficit, 1cpd=severe deficit
+  // Normalize: 1cpd→score 85, 2→70, 4→50 (threshold), 8→30, 12→15, 16→5
+  const scores={1:85,2:70,4:50,8:30,12:15,16:5};
+  const rawScore=scores[f];
+  S.sf=rawScore;
+  const lbl=f>=8?'Normal':(f>=4?'Threshold':(f>=2?'Mild deficit':'Significant deficit'));
+  document.getElementById('sfresult').innerHTML=`<strong style="color:var(--teal)">${f} cpd resolved</strong> — ${lbl} — <strong>Detail Score: ${rawScore}/100</strong>`;
+  document.getElementById('sf-score-val').textContent=rawScore;
+  document.getElementById('sf-score-lbl').textContent=`${f} cpd · ${lbl}`;
+  document.getElementById('sf-next').style.display='inline-block';
+  updateHeroDash();toast(`✓ Detail test recorded: ${f} cpd`);
+}
+
+// ===== GLARE =====
+function updateGlare(v){
+  S.glareVal=v;
+  const cv=document.getElementById('govl');
+  cv.width=cv.parentElement.offsetWidth||480;cv.height=cv.parentElement.offsetHeight||240;
+  const ctx=cv.getContext('2d');ctx.clearRect(0,0,cv.width,cv.height);
+  if(v>0){
+    const a=v/100*0.8;
+    const g=ctx.createRadialGradient(cv.width/2,cv.height/2,0,cv.width/2,cv.height/2,cv.width*.6);
+    g.addColorStop(0,`rgba(255,250,220,${a})`);g.addColorStop(.5,`rgba(220,235,255,${a*.6})`);g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.fillRect(0,0,cv.width,cv.height);
+  }
+  document.getElementById('gval').textContent=v;
+  // Score: 0% glare = 0 deficit, 100% glare = max deficit
+  const rawScore=Math.round(v);
+  const logSL=(1.0+v/100*.6).toFixed(2);
+  const lbl=v<=20?'Normal (log SL ~1.0–1.2)':v<=60?'Mild–Moderate deficit':' Significant glare disability';
+  document.getElementById('gresult').innerHTML=`<strong style="color:${v<=20?'var(--teal)':v<=60?'var(--cyan)':'var(--violet)'}">${lbl}</strong> · log straylight ≈ ${logSL} · Glare Score: ${rawScore}/100`;
+  document.getElementById('glare-target-info').style.display='block';
+  document.getElementById('g-score-val').textContent=logSL;
+  document.getElementById('g-score-lbl').textContent=lbl;
+  S.glare=rawScore;
+  if(v>5)document.getElementById('g-next').style.display='inline-block';
+  updateHeroDash();
+  // Make numbers harder to see
+  const gnums=['gn1','gn2','gn3','gn4'];
+  gnums.forEach(id=>{document.getElementById(id).style.color=`rgba(245,247,250,${Math.max(.9-v/100*.7,.1)})`; });
+}
+
+// ===== FOG =====
+function updateFog(v){
+  S.fogVal=v;S.fog=v;
+  const a=v/100*0.88;
+  document.getElementById('fogvl').style.background=`rgba(190,205,215,${a})`;
+  document.getElementById('fogval').textContent=v;
+  const lbl=v<=40?'Normal':v<=70?'Mild–Moderate fog':'Severe fog deficit';
+  const col=v<=40?'var(--teal)':v<=70?'var(--cyan)':'var(--violet)';
+  document.getElementById('fogresult').innerHTML=`<strong style="color:${col}">VAS ${v} — ${lbl}</strong> · Fog score: ${v}/100`;
+  document.getElementById('fog-score-val').textContent=v;
+  document.getElementById('fog-score-lbl').textContent=lbl;
+  updateHeroDash();
+}
+
+// ===== CALC LCRI =====
+function calcLCRI(){
+  const cs=S.cs, sf=S.sf, glare=S.glare, fog=S.fog;
+  if(cs===null||sf===null||glare===null||fog===null){
+    toast('⚠ Complete all 4 tests first!',3000);
+    document.getElementById('lcri-action').style.opacity='1';
+    document.getElementById('lcri-action-title').textContent='⚠ Incomplete Assessment';
+    document.getElementById('lcri-action-desc').textContent='Run all 4 tests: Contrast → Detail → Glare → Fog';
+    return;
+  }
+  const lcri=Math.round(cs*.35 + sf*.25 + glare*.20 + fog*.20);
+  let tier,tierClass,actionTitle,actionDesc,tierColor;
+  if(lcri<=35){tier='LUMINARY';tierClass='lt-L';actionTitle='✓ Normal Functional Vision';actionDesc='No cataract-related deficit detected. Recommend annual rescreen.';tierColor='var(--teal)';}
+  else if(lcri<=70){tier='PRISM — Early Stage';tierClass='lt-P';actionTitle='⚠ Sub-Clinical Functional Deficit';actionDesc='Contrast/glare impairment precedes Snellen decline. DTx module enrollment recommended. Ophthalmology referral at next appointment.';tierColor='var(--cyan)';}
+  else{tier='VOYAGER — Advanced';tierClass='lt-V';actionTitle='🔴 Significant Visual Disability';actionDesc='Advanced disability affecting daily activities. Urgent clinical referral required. Luminary volunteer network activation recommended.';tierColor='var(--violet)';}
+  // Animate number
+  const el=document.getElementById('lcri-num');el.style.color=tierColor;
+  let c=0,target=lcri;
+  const ani=setInterval(()=>{c=Math.min(c+2,target);el.textContent=c;if(c>=target)clearInterval(ani);},18);
+  // Tier badge
+  const tb=document.getElementById('lcri-tier');tb.textContent=tier;tb.className='ltbadge '+tierClass;tb.style.opacity='1';
+  // Weight bars
+  setTimeout(()=>{
+    document.getElementById('wf-cs').style.width=cs+'%';document.getElementById('wp-cs').textContent=cs;
+    document.getElementById('wf-sf').style.width=sf+'%';document.getElementById('wp-sf').textContent=sf;
+    document.getElementById('wf-g').style.width=glare+'%';document.getElementById('wp-g').textContent=glare;
+    document.getElementById('wf-fog').style.width=fog+'%';document.getElementById('wp-fog').textContent=fog;
+  },200);
+  // Action
+  document.getElementById('lcri-action').style.opacity='1';
+  document.getElementById('lcri-action').style.borderLeftColor=tierColor;
+  document.getElementById('lcri-action-title').textContent=actionTitle;
+  document.getElementById('lcri-action-desc').textContent=actionDesc;
+  // Summary
+  document.getElementById('lcri-summary').innerHTML=`
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:rgba(245,247,250,.45)">Contrast Sensitivity (35%)</span><span style="color:var(--teal);font-weight:600">${cs}/100</span></div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:rgba(245,247,250,.45)">Detail Recognition (25%)</span><span style="color:var(--cyan);font-weight:600">${sf}/100</span></div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:rgba(245,247,250,.45)">Glare Sensitivity (20%)</span><span style="color:var(--violet);font-weight:600">${glare}/100</span></div>
+    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:rgba(245,247,250,.45)">Fog Perception (20%)</span><span style="color:#FFB74D;font-weight:600">${fog}/100</span></div>
+    <div style="display:flex;justify-content:space-between;padding:10px 0;margin-top:4px;"><span style="font-family:var(--fm);font-size:.72rem;color:rgba(245,247,250,.5)">LCRI Score</span><span style="font-family:var(--fh);font-size:1.2rem;font-weight:800;color:${tierColor}">${lcri} — ${tier}</span></div>
+  `;
+  document.getElementById('btn-export').disabled=false;document.getElementById('btn-export').style.opacity='1';
+  // Update hero dash
+  updateHeroDash(lcri,tierColor,tier);
+  toast(`LCRI: ${lcri} — ${tier}`,4000);
+}
+
+function updateHeroDash(lcri,col,tier){
+  if(lcri!==undefined){
+    document.getElementById('hdlcri').textContent=lcri;document.getElementById('hdlcri').style.color=col;
+    document.getElementById('hdlcribar').style.width=lcri+'%';
+    document.getElementById('hdtier').textContent=tier;document.getElementById('hdtier').style.color=col;document.getElementById('hdtier').style.fontSize='.78rem';
+  }
+  if(S.cs!==null){document.getElementById('hdcs').textContent=S.cs;document.getElementById('hdcsbar').style.width=S.cs+'%';}
+  if(S.glare!==null){document.getElementById('hdgs').textContent=S.glare;document.getElementById('hdgsbar').style.width=S.glare+'%';}
+}
+
+// ===== EXPORT REPORT =====
+function exportReport(){
+  if(S.cs===null){toast('⚠ Complete all tests first!');return;}
+  const lcri=Math.round((S.cs||0)*.35+(S.sf||0)*.25+(S.glare||0)*.20+(S.fog||0)*.20);
+  const tier=lcri<=35?'LUMINARY (Normal)':lcri<=70?'PRISM (Early Stage)':'VOYAGER (Advanced)';
+  const date=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>LENSIGHT Report</title><style>body{font-family:Arial,sans-serif;max-width:600px;margin:40px auto;padding:20px;background:#fff;color:#222;}h1{color:#0E1B2E;border-bottom:3px solid #00D1FF;padding-bottom:12px;}table{width:100%;border-collapse:collapse;margin-top:16px;}td,th{padding:10px 12px;border:1px solid #e0e0e0;text-align:left;}th{background:#0E1B2E;color:#fff;}tr:nth-child(even){background:#f5f8fa;}.score{font-size:2rem;font-weight:800;color:#00D1FF;}.tier{font-size:1.2rem;font-weight:700;color:#8B7CFF;padding:10px;background:#f0f4ff;border-radius:8px;margin:16px 0;}.footer{margin-top:32px;font-size:11px;color:#888;border-top:1px solid #eee;padding-top:12px;}</style></head><body><h1>LENSIGHT — Functional Vision Assessment Report</h1><p><strong>Date:</strong> ${date}<br><strong>Generated by:</strong> LENSIGHT PWA · Universitas Diponegoro 2026</p><div class="score">${lcri}/100</div><div class="tier">Tier: ${tier}</div><table><tr><th>Parameter</th><th>Score</th><th>Weight</th><th>Contribution</th></tr><tr><td>Contrast Sensitivity (Pelli-Robson)</td><td>${S.cs}/100</td><td>35%</td><td>${Math.round(S.cs*.35)}</td></tr><tr><td>Detail Recognition (Campbell-Robson)</td><td>${S.sf}/100</td><td>25%</td><td>${Math.round(S.sf*.25)}</td></tr><tr><td>Glare Sensitivity (C-Quant)</td><td>${S.glare}/100</td><td>20%</td><td>${Math.round(S.glare*.20)}</td></tr><tr><td>Fog Perception (VAS)</td><td>${S.fog}/100</td><td>20%</td><td>${Math.round(S.fog*.20)}</td></tr><tr style="font-weight:bold;background:#e8f4fd;"><td>LCRI Total</td><td colspan="2">Weighted Composite</td><td>${lcri}/100</td></tr></table><h3 style="margin-top:24px;">Clinical Interpretation</h3><p>${lcri<=35?'No cataract-related functional deficit detected. Annual rescreen recommended.':lcri<=70?'Sub-clinical functional deficit detected. Contrast/glare impairment precedes Snellen acuity decline. DTx module enrollment and ophthalmology referral recommended.':'Significant visual disability affecting daily activities. Urgent clinical referral required. Luminary volunteer network activation recommended.'}</p><div class="footer">LENSIGHT · Lensight Cataract Risk Index (LCRI) · Calibrated against LOCS III · Pelli-Robson · Campbell-Robson · C-Quant · ISF 2026<br>⚠ This tool is for screening purposes only. Consult a licensed ophthalmologist for clinical diagnosis.</div></body></html>`;
+  const blob=new Blob([html],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`LENSIGHT_Report_${Date.now()}.html`;a.click();
+  toast('📄 Report exported!');
+}
+
+// ===== GABOR CANVAS =====
+let gaborPhase=0;
+function renderGabor(){
+  const cv=document.getElementById('gabcanvas'),ctx=cv.getContext('2d');
+  cv.width=cv.parentElement.clientWidth;cv.height=320;
+  const W=cv.width,H=cv.height;
+  const sf=+document.getElementById('ksf').value;
+  const contrast=+document.getElementById('kcon').value/100;
+  const ori=+document.getElementById('kori').value*Math.PI/180;
+  const sigma=+document.getElementById('ksig').value;
+  const phase=gaborPhase;
+  const ppd=40,cx=W/2,cy=H/2;
+  const img=ctx.createImageData(W,H);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const dx=(x-cx)/ppd,dy=(y-cy)/ppd;
+    const xr=dx*Math.cos(ori)+dy*Math.sin(ori);
+    const yr=-dx*Math.sin(ori)+dy*Math.cos(ori);
+    const gauss=Math.exp(-(xr*xr+yr*yr)/(2*sigma*sigma));
+    const sine=Math.cos(2*Math.PI*sf*xr+phase);
+    const v=.5+contrast*.5*gauss*sine;
+    const c=Math.round(v*255);
+    const i=(y*W+x)*4;
+    img.data[i]=Math.round(c*.15);img.data[i+1]=Math.round(c*.58+20*gauss);img.data[i+2]=Math.round(c*.9+15*gauss);img.data[i+3]=255;
+  }
+  ctx.putImageData(img,0,0);
+  document.getElementById('gp-sf').textContent=sf+' cpd';
+  document.getElementById('gp-ori').textContent=document.getElementById('kori').value+'°';
+  document.getElementById('gp-con').textContent=document.getElementById('kcon').value+'%';
+}
+setInterval(()=>{gaborPhase+=.15;renderGabor();},100);
+
+// Draw small gabor for AFC
+function drawSmallGabor(canvasId,ori,contrast,sf){
+  const cv=document.getElementById(canvasId),ctx=cv.getContext('2d');
+  const W=70,H=70,cx=35,cy=35,ppd=25,sigma=1.4;
+  const phase=Math.random()*Math.PI*2;
+  const img=ctx.createImageData(W,H);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const dx=(x-cx)/ppd,dy=(y-cy)/ppd;
+    const xr=dx*Math.cos(ori)+dy*Math.sin(ori);
+    const yr=-dx*Math.sin(ori)+dy*Math.cos(ori);
+    const gauss=Math.exp(-(xr*xr+yr*yr)/(2*sigma*sigma));
+    const sine=Math.cos(2*Math.PI*sf*xr+phase);
+    const v=.5+contrast*.5*gauss*sine;
+    const c=Math.round(v*255);
+    const i=(y*W+x)*4;
+    img.data[i]=Math.round(c*.15);img.data[i+1]=Math.round(c*.58+18*gauss);img.data[i+2]=Math.round(c*.9+12*gauss);img.data[i+3]=255;
+  }
+  ctx.putImageData(img,0,0);
+}
+
+// ===== AFC GAME =====
+function newAFCtrial(){
+  const sf=+document.getElementById('ksf').value;
+  const c=S.afc.contrast/100;
+  // Target on random side
+  const side=Math.random()>.5?'left':'right';
+  S.afc.answer=side;
+  const targetOri=(Math.floor(Math.random()*12)*15)*Math.PI/180;
+  const referenceOri=0; // vertical reference
+  S.afc.targetOri=targetOri;
+  if(side==='left'){
+    drawSmallGabor('afc-lcanvas',targetOri,c,sf);
+    drawSmallGabor('afc-rcanvas',referenceOri,c*.3,sf);
+  } else {
+    drawSmallGabor('afc-lcanvas',referenceOri,c*.3,sf);
+    drawSmallGabor('afc-rcanvas',targetOri,c,sf);
+  }
+  document.getElementById('afc-result').textContent='';
+  document.getElementById('afc-left').disabled=false;document.getElementById('afc-right').disabled=false;
+  document.getElementById('afc-prompt').textContent='WHICH SIDE HAS THE TILTED GRATING?';
+}
+function afcAnswer(side){
+  S.afc.trial++;
+  const correct=(side===S.afc.answer);
+  document.getElementById('afc-left').disabled=true;document.getElementById('afc-right').disabled=true;
+  if(correct){
+    S.afc.correct++;S.afc.streak++;S.afc.consec++;
+    document.getElementById('afc-result').innerHTML=`<span style="color:var(--teal)">✓ Correct!</span>`;
+    if(S.afc.consec>=3){S.afc.contrast=Math.max(5,S.afc.contrast-10);S.afc.consec=0;document.getElementById('kcon').value=S.afc.contrast;document.getElementById('lcon').textContent=S.afc.contrast;toast('🎯 3 correct → contrast ↓ (harder)');}
+  } else {
+    S.afc.streak=0;S.afc.consec=0;
+    S.afc.contrast=Math.min(100,S.afc.contrast+15);
+    document.getElementById('kcon').value=S.afc.contrast;document.getElementById('lcon').textContent=S.afc.contrast;
+    document.getElementById('afc-result').innerHTML=`<span style="color:var(--violet)">✗ Incorrect. Contrast ↑ (easier)</span>`;
+  }
+  S.afc.history.push({t:S.afc.trial,c:S.afc.contrast});
+  document.getElementById('afc-trial').textContent=S.afc.trial;
+  document.getElementById('afc-correct').textContent=S.afc.correct;
+  document.getElementById('afc-streak').textContent=S.afc.streak;
+  const thresh=S.afc.trial>4?Math.round(S.afc.history.slice(-5).reduce((a,b)=>a+b.c,0)/Math.min(5,S.afc.history.length))+'%':'–';
+  document.getElementById('afc-threshold').textContent=thresh;
+  drawThresholdChart();
+  renderGabor();
+  setTimeout(newAFCtrial,700);
+}
+function resetAFC(){S.afc={trial:0,correct:0,streak:0,consec:0,contrast:40,history:[],answer:null,targetOri:0};['afc-trial','afc-correct','afc-streak'].forEach(id=>document.getElementById(id).textContent='0');document.getElementById('afc-threshold').textContent='–';document.getElementById('kcon').value=40;document.getElementById('lcon').textContent=40;document.getElementById('afc-result').textContent='';document.getElementById('afc-prompt').textContent='WHICH SIDE HAS THE TILTED GRATING?';newAFCtrial();drawThresholdChart();}
+let autoRunning=false,autoTimer=null;
+function autoRunAFC(){
+  if(autoRunning){clearInterval(autoTimer);autoRunning=false;document.getElementById('autorun-btn').textContent='Auto Demo';return;}
+  autoRunning=true;document.getElementById('autorun-btn').textContent='Stop Demo';
+  autoTimer=setInterval(()=>{if(S.afc.answer)afcAnswer(Math.random()>.35?S.afc.answer:(S.afc.answer==='left'?'right':'left'));},1200);
+}
+
+function drawThresholdChart(){
+  const svg=document.getElementById('tsvg');
+  const W=svg.parentElement.clientWidth-24,H=svg.parentElement.clientHeight-30;
+  if(!S.afc.history.length){svg.innerHTML='';return;}
+  const pts=S.afc.history.slice(-40);
+  const minC=0,maxC=100;
+  const xs=pts.map((p,i)=>10+i/(Math.max(pts.length-1,1))*(W-20));
+  const ys=pts.map(p=>10+(1-p.c/maxC)*(H-20));
+  const path=xs.map((x,i)=>i===0?`M${x},${ys[i]}`:`L${x},${ys[i]}`).join(' ');
+  const area=`M${xs[0]},${H-10}${xs.map((x,i)=>`L${x},${ys[i]}`).join('')}L${xs[xs.length-1]},${H-10}Z`;
+  svg.innerHTML=`<defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00FFC6" stop-opacity=".3"/><stop offset="100%" stop-color="#00FFC6" stop-opacity=".02"/></linearGradient></defs>
+    <path d="${area}" fill="url(#cg)"/>
+    <path d="${path}" stroke="#00FFC6" stroke-width="2" fill="none" stroke-linecap="round"/>
+    ${pts.map((p,i)=>`<circle cx="${xs[i]}" cy="${ys[i]}" r="2.5" fill="${p.c<40?'#00FFC6':'#8B7CFF'}" opacity=".8"/>`).join('')}
+    <text x="4" y="${H-12}" fill="rgba(245,247,250,.2)" font-size="9" font-family="JetBrains Mono,monospace">Trial →</text>
+    <text x="4" y="14" fill="rgba(245,247,250,.2)" font-size="9" font-family="JetBrains Mono,monospace">High</text>
+    <text x="4" y="${H-16}" fill="rgba(245,247,250,.2)" font-size="9" font-family="JetBrains Mono,monospace">Low</text>`;
+}
+
+// ===== WEBRTC SIMULATOR =====
+const lumNames=['Budi Santoso','Siti Rahayu','Ahmad Fauzi','Dewi Kusuma','Rizki Pratama','Nurul Hidayah','Fajar Wibowo'];
+const lumStatus=['on','on','on','busy','off','on','busy'];
+let volunteers=lumNames.map((n,i)=>({name:n,status:lumStatus[i],sessions:Math.floor(Math.random()*5)}));
+function buildVolBoard(){
+  const el=document.getElementById('volboard');el.innerHTML='';
+  volunteers.forEach((v,i)=>{
+    const row=document.createElement('div');row.className='volrow';
+    row.innerHTML=`<div class="volavt" style="background:linear-gradient(135deg,rgba(0,209,255,.15),rgba(139,124,255,.15));color:var(--cyan)">${v.name[0]}</div>
+      <div class="volinf"><div class="volname">${v.name}</div><div class="volmeta">Luminary Vol. · ${v.sessions} sessions today · Undip Health Faculty</div></div>
+      <span class="volstatus ${v.status==='on'?'vs-on':v.status==='busy'?'vs-busy':'vs-off'}">${v.status==='on'?'● Online':v.status==='busy'?'● Busy':'○ Offline'}</span>`;
+    el.appendChild(row);
+  });
+  const online=volunteers.filter(v=>v.status==='on').length;
+  const busy=volunteers.filter(v=>v.status==='busy').length;
+  document.getElementById('vol-online').textContent=online;
+  document.getElementById('vol-busy').textContent=busy;
+  document.getElementById('vol-sessions').textContent=volunteers.reduce((a,v)=>a+v.sessions,0);
+}
+
+// Camera simulation
+function drawCam(cvId,type,active){
+  const cv=document.getElementById(cvId),ctx=cv.getContext('2d');
+  ctx.fillStyle='#050c18';ctx.fillRect(0,0,90,120);
+  if(!active){ctx.fillStyle='rgba(245,247,250,.15)';ctx.font='24px serif';ctx.textAlign='center';ctx.fillText(type==='patient'?'👤':'👁',45,65);return;}
+  // Simulate camera feed
+  const t=Date.now()*.001;
+  if(type==='patient'){
+    // Simulate live camera - environment view
+    const g=ctx.createLinearGradient(0,0,90,120);
+    g.addColorStop(0,`hsl(${200+Math.sin(t)*10},40%,${15+Math.sin(t*.7)*3}%)`);
+    g.addColorStop(1,`hsl(${220+Math.cos(t)*10},35%,${10+Math.cos(t*.5)*2}%)`);
+    ctx.fillStyle=g;ctx.fillRect(0,0,90,120);
+    // Add some environment noise
+    for(let i=0;i<8;i++){ctx.fillStyle=`rgba(${100+Math.random()*80},${120+Math.random()*80},${150+Math.random()*80},.3)`;ctx.fillRect(Math.random()*90,Math.random()*120,Math.random()*20+5,Math.random()*3+1);}
+    // Scan line
+    const sl=(t*40)%120;ctx.fillStyle='rgba(0,209,255,.08)';ctx.fillRect(0,sl,90,2);
+  } else {
+    // Luminary view
+    const g2=ctx.createLinearGradient(0,0,90,120);
+    g2.addColorStop(0,'#0d2040');g2.addColorStop(1,'#1a3a60');
+    ctx.fillStyle=g2;ctx.fillRect(0,0,90,120);
+    ctx.fillStyle='rgba(0,209,255,.6)';ctx.font='28px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('👁',45,55);
+    ctx.fillStyle='rgba(0,255,198,.8)';ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillText('LIVE',45,100);
+  }
+}
+
+let camAnim=null;
+function startCamAnim(){
+  if(camAnim)return;
+  camAnim=setInterval(()=>{
+    if(S.rtc.callActive){drawCam('patcam','patient',true);drawCam('lumcam','luminary',true);}
+  },100);
+}
+
+function rtcConnect(){
+  if(S.rtc.connected){toast('Already connected');return;}
+  const avail=volunteers.filter(v=>v.status==='on');
+  if(!avail.length){toast('⚠ No Luminary volunteers online');return;}
+  const vol=avail[Math.floor(Math.random()*avail.length)];
+  addLog(`Signalling via Socket.io... connecting to ${vol.name}`);
+  document.getElementById('rtcstatus').textContent='● CONNECTING — Signalling handshake...';
+  document.getElementById('rtcstatus').className='rtcstatus st-call';
+  setTimeout(()=>{
+    S.rtc.connected=true;S.rtc.callActive=true;S.sessionCount++;
+    document.getElementById('rtcstatus').textContent=`● WEBRTC P2P ACTIVE — ${vol.name}`;
+    document.getElementById('rtcstatus').className='rtcstatus st-on';
+    document.getElementById('patpulse').style.display='block';document.getElementById('lumpulse').style.display='block';
+    vol.status='busy';vol.sessions++;buildVolBoard();
+    addChat('SYSTEM',`WebRTC connection established. ${vol.name} is now guiding you.`,'patient');
+    addChat(vol.name,'Hello! I can see your camera. How can I help you today?','luminary');
+    addLog(`P2P encrypted channel active · No server AV intermediation · Latency <80ms`);
+    startCamAnim();
+    document.getElementById('vol-sessions').textContent=volunteers.reduce((a,v)=>a+v.sessions,0);
+    toast(`📞 Connected to ${vol.name}`);
+  },1800);
+}
+function rtcDisconnect(){
+  if(!S.rtc.connected){toast('Not connected');return;}
+  S.rtc.connected=false;S.rtc.callActive=false;
+  document.getElementById('rtcstatus').textContent='● WEBRTC — SESSION ENDED';
+  document.getElementById('rtcstatus').className='rtcstatus st-off';
+  document.getElementById('patpulse').style.display='none';document.getElementById('lumpulse').style.display='none';
+  volunteers.forEach(v=>{if(v.status==='busy')v.status='on';});buildVolBoard();
+  addChat('SYSTEM','Session ended. Duration recorded. Thank you.','patient');
+  addLog(`Session ended · Duration logged · Pseudonymised record saved`);
+  if(camAnim){clearInterval(camAnim);camAnim=null;drawCam('patcam','patient',false);drawCam('lumcam','luminary',false);}
+  toast('Session ended');
+}
+function rtcRequest(type){
+  if(!S.rtc.connected){toast('Connect first!');return;}
+  const msgs={obstacle:'🚧 I see an obstacle in front of you. Please stop and wait for my guidance.',read:'📄 Please hold the document steady — I can see it. Let me read it for you.',navigate:'🗺 I can see your surroundings. Turn left slightly — there is a clear path ahead.'};
+  addChat('Luminary',msgs[type]||'Sending guidance...','luminary');
+}
+function sendChat(){
+  const inp=document.getElementById('chatmsg');const msg=inp.value.trim();if(!msg)return;
+  if(!S.rtc.connected){toast('Connect to a Luminary first!');return;}
+  addChat('You (Patient)',msg,'patient');inp.value='';
+  // Simulate luminary response
+  const responses=['I understand. Let me guide you.','I can see that. Move slowly to your right.','The path is clear ahead of you.','I\'m reading the label for you...','Please hold still for a moment.'];
+  setTimeout(()=>addChat('Luminary',responses[Math.floor(Math.random()*responses.length)],'luminary'),900);
+}
+function addChat(sender,msg,type){
+  const chat=document.getElementById('rtcchat');
+  const div=document.createElement('div');div.className='cmsg '+type;
+  div.innerHTML=`<div class="csender">${sender}</div>${msg}`;
+  chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
+}
+function addLog(msg){document.getElementById('rtclog').textContent=msg;}
+
+// ===== ROADMAP =====
+const roadmap=[
+  {phase:'Phase 0 · Complete',title:'Prototype',desc:'Algorithm design, card instrumentation (ICC Fogra39, retroreflective), PWA development, DTx protocol specification.',detail:'Functional prototype operational at Universitas Diponegoro. All three modules (Diagnostic, DTx, AT) implemented in single PWA.',metric:'✓ Functional Prototype',done:true,current:false},
+  {phase:'Phase 1 · 0–6 Months',title:'Pilot Deployment',desc:'Posyandu card distribution across 10 sites in Semarang. 500-user feasibility cohort. Kader kesehatan training.',detail:'80% completion rate target. UX score collection. Kader training sessions. Card set quality control with densitometer.',metric:'500 LCRI Screenings · 10 Posyandu',done:false,current:true},
+  {phase:'Phase 2 · 6–18 Months',title:'Clinical Validation',desc:'LCRI vs LOCS III correlation study at RSND Semarang (200 patients). Algorithm refinement. Peer-reviewed publication.',detail:'Pearson r >0.75, sensitivity >80% at Prism/Voyager boundary. Fellowship-trained ophthalmologist graders. Regression modelling refinement.',metric:'r > 0.75 · Published Sensitivity/Specificity',done:false,current:false},
+  {phase:'Phase 3 · 18–36 Months',title:'Provincial Scaling',desc:'BPJS Kesehatan referral integration. Provincial expansion across Central Java. AI trajectory modelling for predictive tier progression.',detail:'LCRI-to-referral-letter API compatible with BPJS digital system. AI predicts rapid progressors. 10,000+ screenings.',metric:'10,000 Screenings · BPJS API Live',done:false,current:false},
+  {phase:'Phase 4 · 36+ Months',title:'National Deployment',desc:'National cataract surveillance platform. Disease extension to glaucoma and AMD. WHO SEARO partnership.',detail:'Epidemiological spatial mapping across Indonesian provinces. Glaucoma and AMD extension protocols validated. International replication.',metric:'National Dataset · WHO Partnership',done:false,current:false},
+];
+function buildRoadmap(){
+  const el=document.getElementById('tline');el.innerHTML='';
+  roadmap.forEach((r,i)=>{
+    const item=document.createElement('div');item.className='titem rv';
+    item.innerHTML=`<div class="tdot ${r.done?'done':r.current?'current':''}"></div>
+      <div class="tphase">${r.phase}</div>
+      <div class="ttitle">${r.title}</div>
+      <div class="tdesc">${r.desc}</div>
+      <div class="tdetail" style="margin-top:8px;font-size:.78rem;color:rgba(245,247,250,.35);line-height:1.55;">${r.detail}</div>
+      <div class="tmetric">${r.metric}</div>`;
+    item.onclick=()=>{item.classList.toggle('open');};
+    el.appendChild(item);
+  });
+}
+
+// ===== GOALS =====
+const goals=[
+  {n:'200',l:'Validation Cohort',d:'LCRI vs LOCS III correlation at RSND Semarang. Pearson r >0.75 within 12 months.',pct:20},
+  {n:'500',l:'Feasibility Screenings',d:'10 Posyandu in Semarang. 80% completion rate target. 6 months post-card production.',pct:10},
+  {n:'70%',l:'DTx Adherence',d:'Session completion rate for Prism-tier patients. Gamified 15-min protocol.',pct:70},
+  {n:'50',l:'Luminary Volunteers',d:'Active trained volunteers. <3 min avg response time. Via Undip health faculty.',pct:40},
+  {n:'BPJS',l:'Integration Target',d:'LCRI-to-referral-letter API. Pilot referrals for 50 patients. 18 months post-validation.',pct:5},
+  {n:'r>0.75',l:'Pearson Correlation',d:'LCRI vs LOCS III gold standard. Sensitivity >80% at Prism/Voyager boundary.',pct:10},
+];
+function buildGoals(){
+  const el=document.getElementById('goalsGrid');el.innerHTML='';
+  goals.forEach(g=>{
+    const card=document.createElement('div');card.className='goalcard rv';
+    card.innerHTML=`<div class="gnum">${g.n}</div><div class="glbl">${g.l}</div><div class="gdesc">${g.d}</div><div class="pbar"><div class="pfill" style="width:0%" data-pct="${g.pct}"></div></div><div class="ptxt">${g.pct}% progress</div>`;
+    el.appendChild(card);
+  });
+}
+// Animate progress bars on scroll
+const pbarObs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.pfill').forEach(b=>{b.style.width=b.dataset.pct+'%';});}}),{threshold:.3});
+
+// ===== INIT ALL =====
+function initAll(){
+  initHeroCanvas();
+  countUp('cnt94',94,'M');
+  countUp('cnt45',45,'%');
+  drawDiverge();
+  initEco();
+  buildCS();
+  buildSF();
+  buildVolBoard();
+  buildRoadmap();
+  buildGoals();
+  newAFCtrial();
+  drawCam('patcam','patient',false);drawCam('lumcam','luminary',false);
+  renderGabor();
+  drawThresholdChart();
+  // Observe goal cards
+  setTimeout(()=>{document.querySelectorAll('#goalsGrid .goalcard').forEach(c=>pbarObs.observe(c));},500);
+  // Initial reveal
+  setTimeout(()=>{document.querySelectorAll('.rv,.rvl,.rvr').forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight)el.classList.add('on');});},200);
+  toast('LENSIGHT loaded. Start your functional screening! →',4000);
+}
+</script>
+</body>
+</html>
